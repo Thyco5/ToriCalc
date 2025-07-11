@@ -5,11 +5,19 @@
 {% block head_extra %}
   {{ super() }}
   <style>
-    .citation-controls { display: flex; align-items-center; gap: 10px; margin-bottom: 1rem;}
+    .citation-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;}
     .citation-display { font-size: 0.9em; }
     .citation-item { margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f0f0f0; }
     .citation-item:last-child { border-bottom: none; }
     .bibtex { white-space: pre-wrap; background-color: #e9ecef; padding: 10px; border-radius: 5px; font-family: monospace; }
+    
+    /* --- Style for copy feedback --- */
+    .copied-feedback {
+        background-color: #d1e7dd !important; /* Bootstrap success green */
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+        transition: all 0.2s ease-in-out;
+    }
   </style>
 {% endblock %}
 
@@ -45,21 +53,43 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentCitations = [];
 
-    const formatters = {
-        default: (cit) => { const d = cit.data; return `<div class="d-flex justify-content-between"><div><strong>[${cit.id}]</strong> ${d.authors.join(', ')} (${d.year}). <em>${d.title}</em>.</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; },
-        apa: (cit) => { const d = cit.data; let str = `${d.authors.join(', ')}. (${d.year}). <em>${d.title}</em>.`; if (d.journal) str += ` ${d.journal}.`; return `<div class="d-flex justify-content-between"><div>${str}</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; },
-        acs: (cit) => { const d = cit.data; return `<div class="d-flex justify-content-between"><div>${d.authors.join('; ')} ${d.title}. <em>${d.journal}</em> <strong>${d.year}</strong>.</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; },
-        bibtex: (cit) => { const d = cit.data; let str = `@misc{${cit.id},\n  author = {${d.authors.join(' and ')}},\n  title = {${d.title}},\n  year = {${d.year}}\n}`; return `<div class="d-flex justify-content-between align-items-start"><div><pre class="bibtex">${str}</pre></div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; }
+    // --- Formatters to create the HTML for display ---
+    const htmlFormatters = {
+        default: (cit) => { const d = cit.data; return `<div class="d-flex justify-content-between align-items-center"><div><strong>[${cit.id}]</strong> ${d.authors.join(', ')} (${d.year}). <em>${d.title}</em>.</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn" aria-label="Copy citation">Copy</button></div>`; },
+        apa: (cit) => { const d = cit.data; let str = `${d.authors.join(', ')}. (${d.year}). <em>${d.title}</em>.`; if (d.journal) str += ` ${d.journal}.`; return `<div class="d-flex justify-content-between align-items-center"><div>${str}</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn" aria-label="Copy APA citation">Copy</button></div>`; },
+        acs: (cit) => { const d = cit.data; return `<div class="d-flex justify-content-between align-items-center"><div>${d.authors.join('; ')} ${d.title}. <em>${d.journal}</em> <strong>${d.year}</strong>.</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn" aria-label="Copy ACS citation">Copy</button></div>`; },
+        bibtex: (cit) => { const d = cit.data; let str = `@misc{${cit.id},\n  author = {${d.authors.join(' and ')}},\n  title = {${d.title}},\n  year = {${d.year}}\n}`; return `<div class="d-flex justify-content-between align-items-start"><div><pre class="bibtex">${str}</pre></div><button class="btn btn-outline-secondary btn-sm copy-citation-btn" aria-label="Copy BibTeX citation">Copy</button></div>`; }
+    };
+    
+    // --- NEW: Formatters to create plain text for the clipboard ---
+    const textFormatters = {
+        default: (cit) => { const d = cit.data; return `[${cit.id}] ${d.authors.join(', ')} (${d.year}). ${d.title}.`; },
+        apa: (cit) => { const d = cit.data; let str = `${d.authors.join(', ')}. (${d.year}). ${d.title}.`; if (d.journal) str += ` ${d.journal}.`; return str; },
+        acs: (cit) => { const d = cit.data; return `${d.authors.join('; ')} ${d.title}. ${d.journal} ${d.year}.`; },
+        bibtex: (cit) => { const d = cit.data; return `@misc{${cit.id},\n  author = {${d.authors.join(' and ')}},\n  title = {${d.title}},\n  year = {${d.year}}\n}`; }
     };
 
+    // --- UPDATED: This function now attaches the data to the buttons ---
     function displayCitations(format = 'default') {
         const citationDisplay = document.getElementById('citation-display-dipole');
         if (!currentCitations.length || !citationDisplay) return;
-        citationDisplay.innerHTML = currentCitations.map(c => formatters[format](c)).join('<hr class="my-1">');
+
+        // 1. Generate and display the HTML from the formatters
+        citationDisplay.innerHTML = currentCitations.map(c => htmlFormatters[format](c)).join('<hr class="my-1">');
+        
+        // 2. Find all the newly created buttons
+        const buttons = citationDisplay.querySelectorAll('.copy-citation-btn');
+        
+        // 3. Loop through the buttons and attach the correct plain-text data to each one
+        buttons.forEach((button, index) => {
+            const citation = currentCitations[index];
+            const textToCopy = textFormatters[format](citation);
+            button.dataset.clipboardText = textToCopy;
+        });
     }
 
     resultsContainer.addEventListener('click', (e) => {
-        // --- Logic for "Copy Table" button ---
+        // --- Logic for "Copy Table" button (unchanged) ---
         if (e.target.matches('#copy-results-btn')) {
             const table = document.getElementById('dipole-results-table');
             if (!table) return;
@@ -71,19 +101,30 @@ document.addEventListener('DOMContentLoaded', function() {
             navigator.clipboard.writeText(text).then(() => { e.target.textContent = 'Copied!'; setTimeout(() => e.target.textContent = 'Copy Table as TSV', 2000); });
         }
         
-        // --- Logic for citation format buttons ---
+        // --- Logic for citation format buttons (unchanged) ---
         if (e.target.matches('.format-btn')) {
             document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             displayCitations(e.target.dataset.format);
         }
 
-        // --- NEW: Logic for the individual "Copy Citation" buttons ---
+        // --- FIXED: Logic for the individual "Copy Citation" buttons ---
         if (e.target.matches('.copy-citation-btn')) {
-            const textToCopy = unescape(e.target.dataset.clipboardText);
-            navigator.clipboard.writeText(textToCopy);
-            e.target.textContent = 'Copied!';
-            setTimeout(() => { e.target.textContent = 'Copy'; }, 2000);
+            // Read the text from the data attribute we added in displayCitations()
+            const textToCopy = e.target.dataset.clipboardText;
+            
+            if (textToCopy) { // Check that text exists before copying
+                navigator.clipboard.writeText(textToCopy);
+                
+                // Provide visual feedback
+                e.target.textContent = 'Copied!';
+                e.target.classList.add('copied-feedback');
+                
+                setTimeout(() => {
+                    e.target.textContent = 'Copy';
+                    e.target.classList.remove('copied-feedback');
+                }, 2000);
+            }
         }
     });
 
