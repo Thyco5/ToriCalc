@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     resultsContainer.addEventListener('click', (e) => {
+        // --- Logic for "Copy Table" button ---
         if (e.target.matches('#copy-results-btn')) {
             const table = document.getElementById('dipole-results-table');
             if (!table) return;
@@ -67,12 +68,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cells = row.querySelectorAll('td');
                 text += `${cells[0].innerText}\t${cells[1].querySelector('.dipole-result-value').dataset.baseValueDebye}\n`;
             });
-            navigator.clipboard.writeText(text).then(() => { e.target.textContent = 'Copied!'; setTimeout(() => e.target.textContent = 'Copy Table', 2000); });
+            navigator.clipboard.writeText(text).then(() => { e.target.textContent = 'Copied!'; setTimeout(() => e.target.textContent = 'Copy Table as TSV', 2000); });
         }
+        
+        // --- Logic for citation format buttons ---
         if (e.target.matches('.format-btn')) {
             document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             displayCitations(e.target.dataset.format);
+        }
+
+        // --- NEW: Logic for the individual "Copy Citation" buttons ---
+        if (e.target.matches('.copy-citation-btn')) {
+            const textToCopy = unescape(e.target.dataset.clipboardText);
+            navigator.clipboard.writeText(textToCopy);
+            e.target.textContent = 'Copied!';
+            setTimeout(() => { e.target.textContent = 'Copy'; }, 2000);
         }
     });
 
