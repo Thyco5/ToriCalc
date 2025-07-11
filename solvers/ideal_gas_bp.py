@@ -13,7 +13,7 @@ ideal_gas_bp = Blueprint('ideal_gas', __name__, template_folder='../templates')
 # --- Page Rendering Route ---
 @ideal_gas_bp.route('/calculators/ideal-gas-properties')
 def ideal_gas_page():
-    return render_template('ideal_gas_calculator.html')
+    return render_template('calculator_ideal_gas.html')
 
 # --- The Single, Unified API Endpoint ---
 @ideal_gas_bp.route('/api/ideal_gas/get_comparison_data', methods=['POST'])

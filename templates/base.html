@@ -109,6 +109,14 @@
                                     <li><a class="dropdown-item" href="{{ url_for('dipole_moment.dipole_moment_page') }}">Dipole Moment (NIST)</a></li>
                                 </ul>
                             </li>
+                            <li class="calculator-submenu-item vertical-expand-item"> 
+                                <a class="dropdown-item dropdown-toggle vertical-expand-trigger" href="#" id="idealGasSubmenuToggle" aria-expanded="false">
+                                    Ideal Gas Calculator <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <ul class="dropdown-menu-vertical-expansion" aria-labelledby="idealGasSubmenuToggle">
+                                    <li><a class="dropdown-item" href="{{ url_for('ideal_gas.ideal_gas_page') }}">Ideal Gas Properties</a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                      <li class="nav-item">
