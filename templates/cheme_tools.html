@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}ChemE Tools | ToriCalc{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cheme_tools_page.css') }}">
+    {# <link rel="stylesheet" href="{{ url_for('static', filename='css/solver_suite_page.css') }}"> #} {# Ensure this is removed or confirmed if specific card styles are still needed from it #}
+    <style>
+        /* REMOVE .cheme-tools-content styles as they are now handled by cheme_tools_page.css */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="cheme-tools-page-wrapper container py-5">
+    <!-- Page Header - Styled to match Homepage Hero -->
+    <header class="text-center mb-5 cheme-tools-page-header anim-target-js">
+        <h1 class="display-4 fw-bold">ChemE Tools</h1>
+        <p class="lead lead-subtitle mt-3">
+            This space is dedicated to developing a suite of practical utilities aimed at tackling common challenges encountered in Chemical Engineering.
+        </p>
+    </header>
+
+    <!-- Introduction / Vision Statement Section -->
+    <section class="vision-statement-section mb-5 py-4 px-lg-5 px-md-4 px-3 bg-light rounded anim-target-js">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h2 class="fw-bold mb-3 section-headline">Building Practical Solutions for Chemical Engineers</h2>
+                {# The first sentence was moved to the subtitle above #}
+                <p class="mb-3">
+                    Initially inspired by the complexities of my Plant Design course at Universitas Indonesia, the ambition is to build and share tools that can assist both students in their academic journey and professionals in their practice.
+                </p>
+                <p class="text-muted">
+                    While many of these tools are currently in conceptual or early development stages, the goal is to create resources that are both insightful and genuinely useful for the ChemE community.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content: Planned & Conceptual Tools Section -->
+    <div class="planned-tools-section-wrapper mb-5"> 
+        <section class="planned-tools-section container py-5">
+            <div class="text-center mb-5 anim-target-js">
+                <h2 class="fw-bold section-headline">Explorations & Future Developments</h2>
+            </div>
+
+            <div class="row gy-4 justify-content-center">
+                <!-- Card 1: Transportation Cost Estimator -->
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card tool-card h-100 shadow-sm w-100 anim-target-js">
+                        <div class="card-body d-flex flex-column">
+                            <div class="tool-status-indicator">Conceptual / Planned</div>
+                            <div class="card-icon mx-auto mt-3"><i class="fas fa-truck-moving fa-2x"></i></div> 
+                            <h5 class="card-title mt-3 text-center">Transportation Cost Estimator</h5>
+                            <p class="card-text flex-grow-1 small text-muted text-center">
+                                A planned tool to assist in estimating the diverse transportation costs associated with materials, products, and equipment, crucial for comprehensive plant design projects and economic evaluations.
+                            </p>
+                            {# No button or a very muted placeholder if desired #}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Equipment Design Aids -->
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card tool-card h-100 shadow-sm w-100 anim-target-js">
+                        <div class="card-body d-flex flex-column">
+                            <div class="tool-status-indicator">Conceptual / Planned</div>
+                            <div class="card-icon mx-auto mt-3"><i class="fas fa-cogs fa-2x"></i></div> 
+                            <h5 class="card-title mt-3 text-center">Equipment Design Calculators</h5>
+                            <p class="card-text flex-grow-1 small text-muted text-center">
+                                Exploring the development of calculators for the preliminary design and sizing of key chemical engineering equipment, including reactors, separation vessels, centrifuges, CSTRs, and many more.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Advanced Process Simulation Aids -->
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card tool-card h-100 shadow-sm w-100 anim-target-js">
+                        <div class="card-body d-flex flex-column">
+                            <div class="tool-status-indicator">Exploratory Concept / Long-term</div>
+                            <div class="card-icon mx-auto mt-3"><i class="fas fa-project-diagram fa-2x"></i></div> 
+                            <h5 class="card-title mt-3 text-center">Integrated Process Simulation Aids</h5>
+                            <p class="card-text flex-grow-1 small text-muted text-center">
+                                Investigating concepts for tools to enhance process simulation workflows. One ambitious idea is to facilitate data exchange between distinct simulation stages, for example, linking the output of one FlexPDE reactor model as an input to another. This is a long-term technical exploration.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Your Ideas Welcome! -->
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card tool-card h-100 shadow-sm w-100 suggestion-card anim-target-js">
+                        <div class="card-body d-flex flex-column text-center">
+                            <div class="card-icon mx-auto mt-3"><i class="fas fa-lightbulb fa-2x"></i></div> 
+                            <h5 class="card-title mt-3">More Tools & Your Input Welcome!</h5>
+                            <p class="card-text flex-grow-1 small text-muted">
+                                This collection of ChemE Tools will evolve as new challenges are explored and solutions are developed. Have a suggestion for a tool that would be invaluable for your studies or work in chemical engineering?
+                            </p>
+                            <a href="mailto:torikhft2bioproses@gmail.com?subject=ChemE%20Tool%20Suggestion" class="btn btn-primary mt-auto">
+                                <i class="fas fa-paper-plane me-2"></i>Share Your Idea
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const animatedElements = document.querySelectorAll('.anim-target-js');
+    const toolCards = document.querySelectorAll('.tool-card.anim-target-js'); // Specifically target tool cards for staggering
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1 // At least 10% visible
+    };
+
+    const observerCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                // No need to unobserve if we want animations to re-trigger on scroll up/down, 
+                // but for simple entrance, unobserving is fine and slightly more performant.
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Observe general animated elements (header, intro, section title)
+    animatedElements.forEach(el => {
+        // Exclude tool cards from this loop as they are handled separately for staggering
+        if (!el.classList.contains('tool-card')) {
+            observer.observe(el);
+        }
+    });
+
+    // Observe tool cards with staggered delay
+    toolCards.forEach((card, index) => {
+        card.style.transitionDelay = (index * 0.15) + 's'; 
+        observer.observe(card); 
+    });
+});
+</script>
+{% endblock %} 

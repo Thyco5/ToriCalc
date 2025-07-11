@@ -1,0 +1,148 @@
+/* static/css/sponsors_page.css */
+
+.sponsors-page-wrapper .sponsors-page-header,
+.support-intro-section .row > div,
+.why-sponsor-section .text-center, /* Header of why-sponsor */
+.value-prop-card, /* Individual benefit cards */
+.get-involved-section .row > div,
+.our-sponsors-section .text-center, /* Header of our-sponsors */
+.sponsor-tier {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.sponsors-page-wrapper .sponsors-page-header.is-visible,
+.support-intro-section .row > div.is-visible,
+.why-sponsor-section .text-center.is-visible,
+.value-prop-card.is-visible,
+.get-involved-section .row > div.is-visible,
+.our-sponsors-section .text-center.is-visible,
+.sponsor-tier.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered delay for value-prop-cards - can be applied via JS */
+.value-prop-card.delay-1 { transition-delay: 0.1s; }
+.value-prop-card.delay-2 { transition-delay: 0.2s; }
+.value-prop-card.delay-3 { transition-delay: 0.3s; }
+.value-prop-card.delay-4 { transition-delay: 0.4s; } /* If there's a 4th for some reason */
+
+.sponsors-page-wrapper .sponsors-page-header {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    background-color: #f8f9fa; /* Light background for header */
+    border-radius: 0.75rem;
+}
+
+.sponsors-page-wrapper .display-4 {
+    color: #0a58ca; /* Primary blue */
+}
+
+/* Section-specific styling */
+.support-intro-section,
+.why-sponsor-section,
+.get-involved-section,
+.our-sponsors-section {
+    margin-bottom: 3rem;
+}
+
+.why-sponsor-section.bg-light,
+.our-sponsors-section.bg-light {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    border-radius: 0.75rem; /* Match header rounding */
+}
+
+.support-intro-section img {
+    max-height: 400px;
+    object-fit: cover;
+}
+
+/* Value Proposition Cards */
+.value-prop-card {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    display: flex; /* Added for flex column behavior */
+    flex-direction: column; /* Added */
+}
+
+.value-prop-card:hover {
+    transform: translateY(-6px); /* Enhanced lift */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12); /* Enhanced shadow */
+}
+
+.value-prop-card .value-icon i {
+    color: #0d6efd; /* Primary color for icons */
+    transition: transform 0.2s ease-in-out; /* For icon hover effect */
+}
+
+.value-prop-card:hover .value-icon i {
+    transform: scale(1.1); /* Subtle icon scale on card hover */
+}
+
+.value-prop-card h5 {
+    color: #343a40;
+}
+
+.value-prop-card p.small {
+    color: #6c757d;
+    flex-grow: 1; /* Ensure paragraphs take space pushing titles up if needed */
+}
+
+/* Sponsor Placeholder Styling */
+.sponsor-tier-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.sponsor-logo-placeholder {
+    background-color: #f8f9fa;
+    height: 120px; /* Default height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-color: #dee2e6 !important;
+}
+
+.sponsor-logo-placeholder.small-logo {
+    height: 90px;
+}
+
+.sponsor-logo-placeholder.very-small-logo {
+    height: auto; /* Adjust for content */
+    min-height: 70px;
+    padding: 0.75rem !important;
+}
+
+.sponsor-logo-placeholder i {
+    color: #adb5bd;
+}
+
+/* Main CTA Button in Get Involved Section */
+.get-involved-section .btn-primary {
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.get-involved-section .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .sponsors-page-wrapper .display-4 {
+        font-size: 2.5rem;
+    }
+    .sponsors-page-wrapper .lead {
+        font-size: 1.1rem;
+    }
+    .support-intro-section .col-lg-6 {
+        text-align: center; /* Center image and text on mobile */
+    }
+    .support-intro-section img {
+        margin-bottom: 1.5rem;
+    }
+} 

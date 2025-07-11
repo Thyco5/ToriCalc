@@ -1,0 +1,271 @@
+/* Basic Navbar Styling */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif; /* Example font */
+}
+
+.navbar {
+    background-color: #fff; /* Example: white background */
+    border-bottom: 1px solid #eee; /* Subtle border */
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px; /* Navbar height */
+    max-width: 1200px; /* Max width of navbar content */
+    margin: 0 auto; /* Center content */
+}
+
+.navbar-logo {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.8em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo .logo-icon {
+    /* Placeholder for logo icon - replace with your SVG or image */
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #555; /* Example icon color */
+    margin-right: 10px;
+    border-radius: 50%; /* If your icon is circular */
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    position: relative; /* For dropdown positioning */
+}
+
+.nav-links {
+    color: #333;
+    text-decoration: none;
+    padding: 0 15px;
+    line-height: 70px; /* Vertically center text */
+    display: block;
+    transition: color 0.3s ease;
+}
+
+.nav-links:hover,
+.nav-links.active {
+    color: #007bff; /* Example hover/active color */
+}
+
+.nav-links i {
+    margin-left: 5px;
+    font-size: 0.8em;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-top: none;
+    min-width: 220px;
+    z-index: 1001;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s ease; /* Delay visibility to prevent interaction when hidden */
+}
+
+.nav-item-dropdown:hover .dropdown-menu,
+.nav-item-dropdown .dropdown-menu.open-by-js { /* Class added by JS to keep open */
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0s; /* Override transition delay for visibility */
+}
+
+.dropdown-item {
+    display: block;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+/* Submenu (Fly-out) */
+.dropdown-submenu-container {
+    position: relative;
+}
+
+.submenu-trigger {
+    display: block;
+    padding: 12px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+    cursor: pointer; /* Indicate it's clickable/hoverable */
+}
+.submenu-trigger i {
+    float: right; /* Position chevron to the right */
+    margin-left: 10px;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: #fff;
+    border: 1px solid #eee;
+    min-width: 200px;
+    z-index: 1002;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px); /* Fly out from right by default */
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s ease;
+}
+
+.dropdown-submenu-container:hover .submenu,
+.dropdown-submenu-container .submenu.open-by-js { /* Class added by JS */
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0s;
+}
+
+.submenu-item {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.submenu-item:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+/* CSS for Flipped Submenus (when JS detects viewport collision) */
+.submenu.flipped-left {
+    left: auto;
+    right: 100%;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.1); /* Adjust shadow direction */
+}
+
+/* In-Panel Submenu Styling (for vertical expansion within main dropdown) */
+.in-panel-submenu {
+    display: block; /* Override absolute positioning of default submenu */
+    position: static; /* Not absolutely positioned */
+    border: none; /* Remove border if it was inherited */
+    box-shadow: none; /* Remove shadow if it was inherited */
+    width: 100%; /* Take full width of its container */
+    padding-left: 15px; /* Indent sub-items */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding-top 0.4s ease-out, padding-bottom 0.4s ease-out; /* Smooth expansion */
+    background-color: #f9f9f9; /* Slightly different background to distinguish */
+}
+
+.dropdown-submenu-container.open > .in-panel-submenu {
+    max-height: 500px; /* Adjust as needed to fit content */
+    /* Add some padding when open for better visual separation */
+    padding-top: 10px;
+    padding-bottom: 10px; 
+}
+
+.in-panel-submenu .submenu-item {
+    padding: 8px 10px; /* Adjust padding for in-panel items */
+    font-size: 0.85em;
+    /* border-top: 1px solid #eee; */ /* Optional separator */
+}
+
+.in-panel-submenu .submenu-item:first-child {
+    /* border-top: none; */
+}
+
+/* Modify submenu trigger icon for open state if using in-panel */
+.dropdown-submenu-container.open > .submenu-trigger i.fa-chevron-down::before {
+    content: "\f077"; /* fas fa-chevron-up */
+}
+
+/* Navbar Icons (Accessibility, Hamburger) */
+.navbar-icons {
+    display: flex;
+    align-items: center;
+}
+
+.nav-icon {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.5em; /* Adjust as needed */
+    padding: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.nav-icon:hover {
+    color: #007bff;
+}
+
+.menu-icon {
+    display: none; /* Hidden on desktop */
+    cursor: pointer;
+    font-size: 1.8em;
+}
+
+/* Basic Responsive (Placeholder) */
+@media screen and (max-width: 960px) {
+    .nav-menu {
+        display: none; /* Hide menu on smaller screens */
+        /* Further responsive styles will be added here */
+    }
+
+    .menu-icon {
+        display: block; /* Show hamburger icon */
+    }
+
+    /* Adjust dropdown/submenu for mobile if needed */
+}
+
+/* Accessibility */
+.nav-links:focus, .dropdown-item:focus, .submenu-trigger:focus, .submenu-item:focus, .nav-icon:focus {
+    outline: 2px solid #007bff; /* Example focus outline */
+    outline-offset: 2px;
+}
+
+/* Helper class to hide elements (used by JS) */
+.hidden {
+    display: none !important;
+}
+
+/* Styling for active-dropdown-item for better visibility */
+.dropdown-item.active-dropdown-item,
+.dropdown-submenu-container.active-dropdown-item > .submenu-trigger {
+    background-color: #e9ecef; /* A light grey for active items */
+    color: #0056b3; /* Darker blue for text */
+} 

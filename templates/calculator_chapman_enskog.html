@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block title %}Chapman-Enskog Diffusion Calculator | ToriCalc{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calculator_page.css') }}">
+    <script>
+        // MathJax Configuration - must be defined BEFORE loading the MathJax script itself
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            tags: 'ams' // Optional: for AMS-style equation numbering
+          },
+          svg: {
+            fontCache: 'global'
+          },
+          startup: {
+            elements: null, // Don't perform an initial typeset
+            ready: () => {
+              window.MathJax.startup.defaultReady();
+            }
+          }
+        };
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page-wrapper container py-5">
+    <header class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Chapman-Enskog Diffusion Calculator</h1>
+        <p class="lead text-muted">Calculate binary gas diffusion coefficients using the Chapman-Enskog theory.</p>
+    </header>
+
+    <form id="chapman-enskog-form" autocomplete="off">
+        <div class="row gy-4">
+            <!-- Input Column -->
+            <div class="col-lg-7">
+                <div class="row gy-4">
+                    <!-- Operating Conditions & Output Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-cogs me-2 text-primary"></i>Operating Conditions & Output</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <label for="T_ce" class="form-label">Temperature (T)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0.000001" class="form-control" id="T_ce" name="T_ce" required>
+                                            <select class="form-select input-unit-select" id="T_ce_unit" name="T_ce_unit">
+                                                <option value="K">K</option>
+                                                <option value="degC">°C</option>
+                                                <option value="degF">°F</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="P_ce" class="form-label">Pressure (P)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0" class="form-control" id="P_ce" name="P_ce" required>
+                                            <select class="form-select input-unit-select" id="P_ce_unit" name="P_ce_unit">
+                                                <option value="bar">bar</option>
+                                                <option value="atm">atm</option>
+                                                <option value="Pa">Pa</option>
+                                                <option value="kPa">kPa</option>
+                                                <option value="psi">psi</option>
+                                                <option value="mmHg">mmHg</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <label for="output_unit_ce" class="form-label">Desired Output Unit (D<sub>AB</sub>)</label>
+                                        <select id="output_unit_ce" name="output_unit_ce" class="form-select">
+                                            <option value="cm^2/s">cm²/s</option>
+                                            <option value="m^2/s">m²/s</option>
+                                            <option value="mm^2/s">mm²/s</option>
+                                            <option value="ft^2/hr">ft²/hr</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Component A Properties Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-atom me-2 text-primary"></i>Component A Properties</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <label for="M_A_ce" class="form-label">Molar Mass (M<sub>A</sub>)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0.000001" class="form-control" id="M_A_ce" name="M_A_ce" required>
+                                            <select class="form-select input-unit-select" id="M_A_ce_unit" name="M_A_ce_unit">
+                                                <option value="g/mol">g/mol</option>
+                                                <option value="kg/mol">kg/mol</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="molecule_select_A_ce" class="form-label">Molecule (Optional)</label>
+                                        <select class="form-select" id="molecule_select_A_ce"> {# Name attribute removed as it's for UI only #}
+                                            <option value="">-- Select Molecule (Optional) --</option>
+                                            {# Options populated by JS #}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="sigma_A_ce" class="form-label">Collision Diameter (σ<sub>A</sub>)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0" class="form-control" id="sigma_A_ce" name="sigma_A_ce" required>
+                                            <select class="form-select input-unit-select" id="sigma_A_ce_unit" name="sigma_A_ce_unit">
+                                                <option value="A">Å</option>
+                                                <option value="nm">nm</option>
+                                                <option value="m">m</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="epsilon_k_A_ce" class="form-label">LJ Energy (ε<sub>A</sub>/κ)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="epsilon_k_A_ce" name="epsilon_k_A_ce" step="any" required>
+                                            <select class="form-select input-unit-select" id="epsilon_k_A_ce_unit" name="epsilon_k_A_ce_unit" style="display:none;"> {# Hidden, value set by JS #}
+                                                <option value="K" selected>K</option>
+                                            </select>
+                                            <span class="input-group-text">K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Component B Properties Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-atom me-2 text-primary"></i>Component B Properties</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <label for="M_B_ce" class="form-label">Molar Mass (M<sub>B</sub>)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0" class="form-control" id="M_B_ce" name="M_B_ce" required>
+                                            <select class="form-select input-unit-select" id="M_B_ce_unit" name="M_B_ce_unit">
+                                                <option value="g/mol">g/mol</option>
+                                                <option value="kg/mol">kg/mol</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="molecule_select_B_ce" class="form-label">Molecule (Optional)</label>
+                                        <select class="form-select" id="molecule_select_B_ce"> {# Name attribute removed #}
+                                            <option value="">-- Select Molecule (Optional) --</option>
+                                            {# Options populated by JS #}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="sigma_B_ce" class="form-label">Collision Diameter (σ<sub>B</sub>)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0" class="form-control" id="sigma_B_ce" name="sigma_B_ce" required>
+                                            <select class="form-select input-unit-select" id="sigma_B_ce_unit" name="sigma_B_ce_unit">
+                                                <option value="A">Å</option>
+                                                <option value="nm">nm</option>
+                                                <option value="m">m</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="epsilon_k_B_ce" class="form-label">LJ Energy (ε<sub>B</sub>/κ)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="epsilon_k_B_ce" name="epsilon_k_B_ce" step="any" required>
+                                             <select class="form-select input-unit-select" id="epsilon_k_B_ce_unit" name="epsilon_k_B_ce_unit" style="display:none;"> {# Hidden, value set by JS #}
+                                                <option value="K" selected>K</option>
+                                            </select>
+                                            <span class="input-group-text">K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- Action Buttons -->
+                    <div class="col-md-12 d-flex justify-content-start gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg hero-cta"><i class="fas fa-calculator me-2"></i>Calculate D<sub>AB</sub></button>
+                        <button type="reset" class="btn btn-outline-secondary btn-lg"><i class="fas fa-undo me-2"></i>Reset Fields</button>
+                    </div>
+                    <div id="range-warning-ce" class="alert alert-warning mt-3" style="display:none;"></div>
+                </div>
+            </div>
+
+            <!-- Output Column -->
+            <div class="col-lg-5">
+                <div class="sticky-lg-top" style="top: 100px;">
+                    <div class="card output-card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0 card-title-custom"><i class="fas fa-check-circle me-2"></i>Result</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div id="result-placeholder-ce" class="result-placeholder fs-5 text-muted text-center">
+                                Enter parameters and click 'Calculate D<sub>AB</sub>' to see results.
+                            </div>
+                            <div id="result-display-ce" style="display:none;">
+                                <p class="fs-3 fw-bold text-center text-primary mb-1" id="result-value-ce"></p> {# For numerical value #}
+                                <p class="text-center text-muted small" id="result-unit-ce"></p> {# For unit symbol #}
+                            </div>
+                            <hr id="result-hr-ce" style="display:none;" class="my-3">
+                            
+                            <button class="btn btn-secondary w-100 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#latexStepsContent" aria-expanded="false" aria-controls="latexStepsContent">
+                                <i class="fas fa-stream me-2"></i>Show/Hide Calculation Steps
+                            </button>
+                            <div class="collapse" id="latexStepsContent">
+                                <div class="border rounded p-3 bg-light mathjax-container" id="latex-steps-ce" style="max-height: 300px; overflow-y: auto;">
+                                    Step-by-step calculation details will appear here.
+                                </div>
+                                <button type="button" id="copy-latex-btn-ce" class="btn btn-outline-primary btn-sm mt-2 w-100"><i class="fas fa-copy me-2"></i>Copy LaTeX Steps</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supporting Information Accordion -->
+                    <div class="accordion shadow-sm" id="supportingInfoAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingCitation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCitation" aria-expanded="false" aria-controls="collapseCitation">
+                                    <i class="fas fa-book-reader me-2 text-primary"></i>Citation (Original Paper)
+                                </button>
+                            </h2>
+                            <div id="collapseCitation" class="accordion-collapse collapse" aria-labelledby="headingCitation" data-bs-parent="#supportingInfoAccordion">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select id="paper-citation-format-ce" class="form-select form-select-sm w-auto">
+                                            <option value="Default">Default</option>
+                                            <option value="APA">APA</option>
+                                            <option value="ACS">ACS</option>
+                                            <option value="BibTeX">BibTeX</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-citation-btn-ce"><i class="fas fa-copy me-2"></i>Copy</button>
+                                    </div>
+                                    <div id="citation-ce-display" class="small text-muted mb-1"></div>
+                                    <span id="doi-link-ce" class="small"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingToolCitation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToolCitation" aria-expanded="false" aria-controls="collapseToolCitation">
+                                    <i class="fas fa-laptop-code me-2 text-primary"></i>Cite This Tool
+                                </button>
+                            </h2>
+                            <div id="collapseToolCitation" class="accordion-collapse collapse" aria-labelledby="headingToolCitation" data-bs-parent="#supportingInfoAccordion">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select id="tool-citation-format-ce" class="form-select form-select-sm w-auto">
+                                            <option value="Default">Default</option>
+                                            <option value="APA">APA</option>
+                                            <option value="ACS">ACS</option>
+                                            <option value="BibTeX">BibTeX</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-tool-citation-btn-ce"><i class="fas fa-copy me-2"></i>Copy</button>
+                                    </div>
+                                    <div id="tool-citation-ce-display" class="small text-muted mb-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingApplicability">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseApplicability" aria-expanded="false" aria-controls="collapseApplicability">
+                                    <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Applicability Notes
+                                </button>
+                            </h2>
+                            <div id="collapseApplicability" class="accordion-collapse collapse" aria-labelledby="headingApplicability" data-bs-parent="#supportingInfoAccordion">
+                                <div class="accordion-body">
+                                    <p id="applicability-notes-ce" class="small text-muted">Valid for dilute gas mixtures (~300–2000 K, <10 bar). For D<sub>AB</sub> in cm²/s, use T in K, P in atm, M in g/mol, σ in Å.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax-script" async></script>
+    {# Link to the specific calculator JS, which handles calculations and MathJax updates #}
+    <script src="{{ url_for('static', filename='js/chapman_enskog_calculator.js') }}"></script>
+{% endblock %}

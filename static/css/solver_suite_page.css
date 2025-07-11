@@ -1,0 +1,323 @@
+/* static/css/solver_suite_page.css */
+
+/* Page Header Area */
+.solver-suite-header {
+    padding-top: 2.5rem; /* More padding */
+    padding-bottom: 2.5rem;
+    background-color: #f4f7fc; /* A slightly cooler, more sophisticated light grey/blue */
+    /* Alt: background-image: linear-gradient(to bottom, #eef3fb, #f8f9fa); */
+    border-radius: 0.75rem; /* Match card rounding */
+    margin-bottom: 3.5rem !important; 
+}
+
+.solver-suite-wrapper .display-4 {
+    color: #0a58ca; /* Darker Bootstrap primary blue for more contrast */
+    margin-bottom: 0.5rem; 
+    font-weight: 700; /* Slightly bolder */
+}
+
+.solver-suite-wrapper .lead-tagline {
+    font-size: 1.25rem;
+    color: #6c757d; /* Bootstrap secondary text color */
+    margin-bottom: 0; /* Removed bottom margin as header has padding */
+}
+
+/* New container for scroller and arrows */
+.cards-scroller-container {
+    /* background-color: #fbfcfe; */ /* Very subtle differentiating background - can uncomment if desired */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem; /* Space below the scroller section */
+}
+
+/* Horizontal Scroller */
+.horizontal-scroll-wrapper {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox - hide scrollbar */
+}
+
+/* Hide scrollbar for Webkit browsers */
+.horizontal-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+/* Subtle Scrollbar Styling (Webkit browsers) */
+.horizontal-scroll-wrapper::-webkit-scrollbar {
+    height: 6px; /* Further reduced height */
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Lighter track */
+    border-radius: 8px;
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #d0d0d0; /* Lighter thumb */
+    border-radius: 8px;
+}
+.horizontal-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #b0b0b0; /* Slightly darker on hover */
+}
+
+/* Ensure the row itself doesn't introduce unwanted scrollbars if parent handles it */
+.horizontal-scroll-wrapper .row.flex-nowrap {
+    margin-bottom: 0; /* Prevent bottom margin from creating unwanted space if parent has padding */
+    padding-bottom: 10px; /* Add some padding for the scrollbar so it doesn't overlap cards */
+}
+
+.solver-category-card {
+    border: 1px solid #e9e9e9; /* Slightly lighter border */
+    border-radius: 0.75rem;
+    transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out, border-color 0.25s ease-in-out;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Refined base shadow */
+    height: 100%; 
+    display: flex; 
+    flex-direction: column;
+    width: 290px; /* Adjusted width */
+    min-width: 270px; /* Adjusted min-width */
+    margin-right: 0.75rem; /* gx-4 on row gives 1.5rem, so this can be reduced or row padding adjusted */
+    opacity: 0; /* Initially hidden for animation */
+    transform: translateX(20px); /* Initial state for slide-in */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.solver-category-card.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Add a transition delay for staggered animation if desired */
+/* .solver-category-card:nth-child(2) { transition-delay: 0.1s; }
+.solver-category-card:nth-child(3) { transition-delay: 0.2s; }
+... etc ... */
+
+.horizontal-scroll-wrapper .row.flex-nowrap .col-auto:last-child .solver-category-card {
+    margin-right: 0; /* No margin for the very last card */
+}
+
+
+.solver-category-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); /* More pronounced shadow on hover */
+    border-color: #0d6efd;
+}
+
+.solver-category-card .card-body {
+    padding: 1.75rem; /* Slightly adjusted padding */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+}
+
+.solver-category-card .card-icon {
+    font-size: 2.2rem;
+    color: #fff; /* Icon color to white for better contrast on gradient */
+    margin-bottom: 1rem;
+    line-height: 1;
+    width: 60px;
+    height: 60px;
+    background-image: linear-gradient(135deg, #0d6efd, #0a58ca); /* Gradient background */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto; /* Center the icon background */
+    margin-right: auto;
+    transition: transform 0.2s ease-in-out; /* For icon animation on card hover */
+}
+
+.solver-category-card:hover .card-icon {
+    transform: scale(1.15) rotate(5deg);
+    background-image: linear-gradient(135deg, #0b5ed7, #094aaa); /* Darker gradient on hover */
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+}
+
+.solver-category-card .card-title {
+    font-size: 1.25rem; /* Base size slightly reduced */
+    font-weight: 700; 
+    color: #343a40;
+    margin-bottom: 0.75rem;
+    white-space: normal; /* Ensure title text can wrap */
+    overflow-wrap: break-word; /* Help break long words if necessary */
+    word-wrap: break-word; /* Legacy support */
+    line-height: 1.3; /* Adjust line height for wrapped titles */
+    min-height: 2.6em; /* 2 lines * 1.3 line-height */
+    display: block; /* Ensure min-height is respected consistently */
+}
+
+.solver-category-card .card-text {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+    flex-grow: 1; 
+    margin-bottom: 1.5rem;
+    white-space: normal; /* Ensure text wraps */
+    overflow-wrap: break-word; /* Break long words to prevent overflow */
+    word-wrap: break-word; /* Legacy support */
+    text-align: left; /* Ensure text is aligned left for readability if not already */
+}
+
+.solver-category-card .btn {
+    padding: 0.55rem 0.8rem; /* Reduced padding */
+    font-size: 0.9rem; /* Base font size slightly reduced */
+    margin-top: auto; 
+    white-space: nowrap; /* Keep button text on one line */
+    overflow: hidden; /* Hide overflow if text is still too long (fallback) */
+    text-overflow: ellipsis; /* Show ellipsis if text overflows (fallback) */
+}
+
+.solver-category-card .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.solver-category-card .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.solver-category-card .btn.disabled,
+.solver-category-card .btn:disabled {
+    background-color: transparent;
+    border: 1px solid #adb5bd; /* Light grey border */
+    color: #adb5bd; /* Light grey text */
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.solver-category-card .btn.disabled .coming-soon-icon,
+.solver-category-card .btn:disabled .coming-soon-icon {
+    margin-right: 0.5rem;
+    /* color: #adb5bd; */ /* Icon will inherit text color */
+}
+
+/* Custom Scroller Buttons */
+.btn-scroller {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-scroller:hover:not(:disabled) {
+    background-color: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.btn-scroller:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: rgba(230, 230, 230, 0.8);
+}
+
+.btn-scroller-prev {
+    left: -15px; /* Adjust for desired position outside the scroller */
+}
+
+.btn-scroller-next {
+    right: -15px; /* Adjust for desired position outside the scroller */
+}
+
+/* Responsive adjustments for scroller buttons */
+@media (max-width: 767.98px) {
+    .btn-scroller-prev {
+        left: 5px;
+    }
+    .btn-scroller-next {
+        right: 5px;
+    }
+    .cards-scroller-container {
+        padding-left: 30px; /* Make space for buttons inside on mobile */
+        padding-right: 30px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) { /* lg breakpoint */
+    .solver-category-card .card-title {
+        font-size: 1.2rem;
+        min-height: 2.6em; /* Recalculate if needed, but 1.3 line-height is still there */
+    }
+    .solver-category-card .card-text {
+        font-size: 0.875rem;
+    }
+    .solver-category-card .card-icon {
+        font-size: 2rem;
+        width: 55px;
+        height: 55px;
+    }
+    .solver-category-card {
+        width: 280px; 
+    }
+    .solver-category-card .btn {
+        font-size: 0.875rem; /* Slightly smaller for lg screens */
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+@media (max-width: 767.98px) { /* md breakpoint */
+    .solver-suite-wrapper .lead-tagline {
+        font-size: 1.1rem;
+        margin-bottom: 0rem; /* Adjusted */
+    }
+    .solver-suite-header {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem; 
+        margin-bottom: 2rem !important;
+    }
+    .solver-category-card .card-title {
+        font-size: 1.15rem;
+        min-height: 2.6em;
+    }
+     .solver-category-card .card-body {
+        padding: 1.25rem;
+    }
+    .solver-category-card {
+        width: 260px; 
+        min-width: 250px;
+    }
+     .horizontal-scroll-wrapper::-webkit-scrollbar {
+        height: 6px;
+    }
+    .solver-category-card .btn {
+        font-size: 0.85rem; /* Further reduction for md screens */
+        padding: 0.5rem 0.7rem;
+    }
+}
+
+@media (max-width: 575.98px) { /* sm breakpoint */
+    .solver-category-card {
+        width: 240px;
+        min-width: 230px;
+    }
+    .solver-category-card .card-icon {
+        font-size: 1.8rem;
+        width: 50px;
+        height: 50px;
+    }
+    .solver-category-card .card-title {
+        font-size: 1.1rem;
+        line-height: 1.25; /* Line height changes here */
+        min-height: 2.5em; /* 2 lines * 1.25 line-height */
+    }
+    .solver-category-card .card-text {
+        font-size: 0.85rem;
+    }
+    .solver-category-card .btn {
+        font-size: 0.825rem; /* Smallest font size for sm screens */
+        padding: 0.45rem 0.6rem; 
+    }
+} 

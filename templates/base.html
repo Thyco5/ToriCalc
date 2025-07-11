@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ChemE Calc{% endblock %}</title>
+    <!-- Load LOCAL Bootstrap CSS FIRST -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Load your custom styles AFTER Bootstrap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-custom.css') }}"> {# Custom Navbar CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}"> {# Homepage Specific CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about_page.css') }}"> {# About Page Specific CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calculator_page.css') }}"> {# Calculator Page Specific CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solver_suite_page.css') }}"> {# Solver Suite Page CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/category_page.css') }}"> {# Category Page CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sponsors_page.css') }}"> {# Sponsors Page CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cheme_tools_page.css') }}"> {# ChemE Tools Page CSS #}
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          },
+          startup: {
+            ready: () => {
+              console.log('MathJax is ready to go!');
+              MathJax.startup.defaultReady();
+            }
+          }
+        };
+      </script>
+
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm sticky-top py-3 toricalc-navbar"> {# Added custom class #}
+        <div class="container-lg">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='Logo.png') }}" alt="ChemE Calc Logo" height="30" class="me-2">
+                <span>ToriCalc</span> {# Changed to ToriCalc as per original request #}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto justify-content-end mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'index' %}active fw-semibold{% endif %}" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'about' %}active fw-semibold{% endif %}" href="{{ url_for('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'cheme_tools' %}active fw-semibold{% endif %}" href="{{ url_for('cheme_tools') }}">ChemE Tools</a>
+                    </li>
+                    <li class="nav-item dropdown calculators-dropdown"> 
+                        <a class="nav-link dropdown-toggle {% if request.endpoint == 'calculators_landing_page' or request.blueprint in ['diffusion', 'critical_props'] %}active fw-semibold{% endif %}" href="{{ url_for('calculators_landing_page') }}" id="calculatorsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Calculators
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="calculatorsDropdown">                            
+                            <li class="calculator-submenu-item vertical-expand-item"> 
+                                <a class="dropdown-item dropdown-toggle vertical-expand-trigger" href="#" id="diffusionSubmenuToggle" aria-expanded="false">
+                                    Diffusion Coefficients <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <ul class="dropdown-menu-vertical-expansion" aria-labelledby="diffusionSubmenuToggle">
+                                    <li><a class="dropdown-item" href="{{ url_for('diffusion.chapman_enskog') }}">Chapman-Enskog Method</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('diffusion.calculator_fsg') }}">Fuller Method</a></li>
+                                </ul>
+                            </li>
+                            <li class="calculator-submenu-item vertical-expand-item"> 
+                                <a class="dropdown-item dropdown-toggle vertical-expand-trigger" href="#" id="criticalPropsSubmenuToggle" aria-expanded="false">
+                                    Critical Properties <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <ul class="dropdown-menu-vertical-expansion" aria-labelledby="criticalPropsSubmenuToggle">
+                                    <li><a class="dropdown-item" href="{{ url_for('critical_props.calculator_joback_page') }}">Joback Method</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('critical_props.calculator_cg_page_render') }}">Constantinou Gani Method</a></li>
+                                </ul>
+                            </li>
+                            <li class="calculator-submenu-item vertical-expand-item"> 
+                                <a class="dropdown-item dropdown-toggle vertical-expand-trigger" href="#" id="acentricFactorSubmenuToggle" aria-expanded="false">
+                                    Acentric Factor <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <ul class="dropdown-menu-vertical-expansion" aria-labelledby="acentricFactorSubmenuToggle">
+                                    <li><a class="dropdown-item" href="{{ url_for('acentric_factor.acentric_factor_page') }}">Lee-Kesler (LK) Method</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('acentric_factor.cg_acentric_factor_solver_page') }}">Constantinou-Gani (CG) Method</a></li>
+                                </ul>
+                            </li>
+                            <li class="calculator-submenu-item vertical-expand-item">
+                                <a class="dropdown-item dropdown-toggle vertical-expand-trigger" href="#" id="phaseChangeSubmenuToggle" aria-expanded="false">
+                                    Phase Change Properties <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <ul class="dropdown-menu-vertical-expansion" aria-labelledby="phaseChangeSubmenuToggle">
+                                    <li><a class="dropdown-item" href="{{ url_for('phase_change.phase_change_page') }}">Super-Solver</a></li>
+                                </ul>
+                            </li>
+                            <li class="calculator-submenu-item vertical-expand-item"> 
+                                <a class="dropdown-item dropdown-toggle vertical-expand-trigger" href="#" id="dipoleMomentSubmenuToggle" aria-expanded="false">
+                                    Dipole Moment <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <ul class="dropdown-menu-vertical-expansion" aria-labelledby="dipoleMomentSubmenuToggle">
+                                    <li><a class="dropdown-item" href="{{ url_for('dipole_moment.dipole_moment_page') }}">Dipole Moment (NIST)</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'sponsors' %}active fw-semibold{% endif %}" href="{{ url_for('sponsors') }}">Sponsors</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="container my-4 flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="homepage-footer bg-dark text-light py-5 mt-auto fs-6">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-12 text-center text-lg-start">
+                    <h5 class="fw-bold mb-3">ToriCalc</h5>
+                    <p class="small text-muted">&copy; {{ current_year }} ToriCalc. <br>Advanced Chemical Engineering Calculations, Simplified.</p>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="text-uppercase fw-bold mb-3">Quick Links</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="{{ url_for('about') }}" class="text-light text-decoration-none footer-link">About Us</a></li>
+                        <li class="mb-2"><a href="{{ url_for('sponsors') }}" class="text-light text-decoration-none footer-link">Sponsors</a></li>
+                        {# Add other important links here, e.g., Terms, Privacy #}
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="text-uppercase fw-bold mb-3">Contact & Connect</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:torikhft2bioproses@gmail.com" class="text-light text-decoration-none footer-link">torikhft2bioproses@gmail.com</a></li>
+                        <li class="mb-2"><i class="fab fa-instagram me-2"></i><a href="https://www.instagram.com/torikhmohammad/" target="_blank" rel="noopener noreferrer" class="text-light text-decoration-none footer-link">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center pt-4 mt-4 border-top border-secondary">
+                <p class="small text-muted mb-0">ToriCalc - Precision in Chemical Engineering.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='js/navbar_interaction.js') }}"></script>
+    
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        startup: {
+          ready: () => {
+            console.log('MathJax is fully initialized and ready.');
+            MathJax.startup.defaultReady();
+          }
+        }
+      };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    {% block scripts_extra %}{% endblock %}
+</body>
+</html>

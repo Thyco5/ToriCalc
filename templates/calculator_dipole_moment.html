@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Dipole Moment Comparator{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <style>
+    .citation-controls { display: flex; align-items-center; gap: 10px; margin-bottom: 1rem;}
+    .citation-display { font-size: 0.9em; }
+    .citation-item { margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f0f0f0; }
+    .citation-item:last-child { border-bottom: none; }
+    .bibtex { white-space: pre-wrap; background-color: #e9ecef; padding: 10px; border-radius: 5px; font-family: monospace; }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h1>Dipole Moment (μ) Comparator</h1>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <p>Find a chemical to compare its dipole moment from various high-quality data sources.</p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="name-input-dipole" placeholder="Enter chemical name (e.g., chlorobenzene)...">
+                        <button class="btn btn-primary" id="calculate-btn-dipole">Find Data</button>
+                    </div>
+                    <div id="results-container-dipole" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const findButton = document.getElementById('calculate-btn-dipole');
+    const nameInput = document.getElementById('name-input-dipole');
+    const resultsContainer = document.getElementById('results-container-dipole');
+    
+    let currentCitations = [];
+
+    const formatters = {
+        default: (cit) => { const d = cit.data; return `<div class="d-flex justify-content-between"><div><strong>[${cit.id}]</strong> ${d.authors.join(', ')} (${d.year}). <em>${d.title}</em>.</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; },
+        apa: (cit) => { const d = cit.data; let str = `${d.authors.join(', ')}. (${d.year}). <em>${d.title}</em>.`; if (d.journal) str += ` ${d.journal}.`; return `<div class="d-flex justify-content-between"><div>${str}</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; },
+        acs: (cit) => { const d = cit.data; return `<div class="d-flex justify-content-between"><div>${d.authors.join('; ')} ${d.title}. <em>${d.journal}</em> <strong>${d.year}</strong>.</div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; },
+        bibtex: (cit) => { const d = cit.data; let str = `@misc{${cit.id},\n  author = {${d.authors.join(' and ')}},\n  title = {${d.title}},\n  year = {${d.year}}\n}`; return `<div class="d-flex justify-content-between align-items-start"><div><pre class="bibtex">${str}</pre></div><button class="btn btn-outline-secondary btn-sm copy-citation-btn">Copy</button></div>`; }
+    };
+
+    function displayCitations(format = 'default') {
+        const citationDisplay = document.getElementById('citation-display-dipole');
+        if (!currentCitations.length || !citationDisplay) return;
+        citationDisplay.innerHTML = currentCitations.map(c => formatters[format](c)).join('<hr class="my-1">');
+    }
+
+    resultsContainer.addEventListener('click', (e) => {
+        if (e.target.matches('#copy-results-btn')) {
+            const table = document.getElementById('dipole-results-table');
+            if (!table) return;
+            let text = 'Data Source\tDipole Moment (Debye)\n';
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                text += `${cells[0].innerText}\t${cells[1].querySelector('.dipole-result-value').dataset.baseValueDebye}\n`;
+            });
+            navigator.clipboard.writeText(text).then(() => { e.target.textContent = 'Copied!'; setTimeout(() => e.target.textContent = 'Copy Table', 2000); });
+        }
+        if (e.target.matches('.format-btn')) {
+            document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            displayCitations(e.target.dataset.format);
+        }
+    });
+
+    resultsContainer.addEventListener('change', (e) => {
+        if (e.target.matches('.dipole-unit-select')) {
+            const select = e.target;
+            const targetUnit = select.value;
+            const resultSpan = select.closest('td').querySelector('.dipole-result-value');
+            const baseValueDebye = parseFloat(resultSpan.dataset.baseValueDebye);
+            let displayValue = baseValueDebye;
+            if (targetUnit === 'Cm') {
+                displayValue = baseValueDebye * 3.33564e-30;
+                resultSpan.textContent = displayValue.toExponential(4);
+            } else {
+                resultSpan.textContent = displayValue.toFixed(4);
+            }
+        }
+    });
+
+    async function handleDataLookup() {
+        const chemicalName = nameInput.value.trim();
+        if (!chemicalName) return;
+        resultsContainer.innerHTML = '<div class="d-flex align-items-center"><div class="spinner-border spinner-border-sm me-2"></div>Searching...</div>';
+        findButton.disabled = true;
+        try {
+            const response = await fetch('/api/dipole/get_all_data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chemical_name: chemicalName }) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            currentCitations = data.citations || [];
+            buildResultsDisplay(data);
+        } catch (err) { resultsContainer.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+        } finally { findButton.disabled = false; }
+    }
+
+    function buildResultsDisplay(data) {
+        let tableHtml = `<table class="table table-hover mt-3" id="dipole-results-table"><thead class="table-light"><tr><th>Data Source</th><th>Dipole Moment</th></tr></thead><tbody>`;
+        data.results.forEach(res => {
+            tableHtml += `<tr><td><strong>${res.method}</strong></td><td><span class="dipole-result-value" data-base-value-debye="${res.value}">${res.value.toFixed(4)}</span><select class="form-select form-select-sm w-auto d-inline-block ms-2 dipole-unit-select"><option value="D" selected>Debye</option><option value="Cm">C·m</option></select></td></tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        
+        resultsContainer.innerHTML = `
+            <h5>Results for: <strong>${data.chemical_name}</strong> (CAS: ${data.cas})</h5>
+            ${tableHtml}
+            <button class="btn btn-secondary btn-sm" id="copy-results-btn">Copy Table as TSV</button>
+            <div id="citation-section-dipole" class="mt-4"><hr><h5>Citations</h5>
+                <div class="citation-controls"><span class="me-2">Format:</span><div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary format-btn active" data-format="default">Default</button>
+                    <button class="btn btn-outline-secondary format-btn" data-format="apa">APA</button>
+                    <button class="btn btn-outline-secondary format-btn" data-format="acs">ACS</button>
+                    <button class="btn btn-outline-secondary format-btn" data-format="bibtex">BibTeX</button>
+                </div></div>
+                <div id="citation-display-dipole" class="mt-2 citation-display"></div>
+            </div>`;
+        displayCitations('default');
+    }
+
+    findButton.addEventListener('click', handleDataLookup);
+    nameInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') handleDataLookup(); });
+});
+</script>
+{% endblock %}

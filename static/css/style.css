@@ -1,0 +1,46 @@
+/* Custom CSS for SaaS styling */
+:root {
+    --bs-primary: #0d6efd;
+    --bs-primary-rgb: 13, 110, 253;
+}
+body {
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+}
+h1 {
+    color: inherit;
+}
+.nav-link, .dropdown-item {
+    font-weight: 600;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+.nav-link:hover, .dropdown-item:hover {
+    color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+}
+.nav-link.active {
+    font-weight: 600;
+}
+/* Dropdown menus on hover */
+.navbar-nav .nav-item.dropdown:hover > .dropdown-menu {
+    display: block;
+}
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+}
+.dropdown-submenu.dropend .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -0.5rem;
+}
+/* Responsive nested submenu positioning */
+@media (max-width: 992px) {
+    .dropdown-submenu.dropend .dropdown-menu {
+        left: auto !important;
+        right: 100% !important;
+        margin-top: 0 !important;
+    }
+}
+.dropdown-submenu .dropdown-menu {
+    z-index: 2000;
+}

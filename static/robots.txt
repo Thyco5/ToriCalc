@@ -1,0 +1,6 @@
+# Allow all friendly bots to crawl the calculator site
+User-agent: *
+Allow: /
+
+# Explicitly tell bots where to find the sitemap for this site
+Sitemap: https://toricalc.com/static/sitemap.xml

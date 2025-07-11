@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Diffusion Coefficients | ChemE Calc{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4 p-md-5">
+            <h1 class="mb-4">Diffusion Coefficients</h1>
+            <p class="mb-3">Explore available calculators for binary gas diffusion coefficients.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- List of diffusion solvers -->
+    <div class="row g-4 mt-4 justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Chapman–Enskog Diffusion Calculator</h5>
+            <p class="card-text text-muted small mb-4">Compute D<sub>AB</sub> using Chapman–Enskog theory.</p>
+            <a href="{{ url_for('chapman_enskog') }}" class="btn btn-primary mt-auto">Launch</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

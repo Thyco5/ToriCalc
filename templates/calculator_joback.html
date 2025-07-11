@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Joback Method Calculator | ToriCalc{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/joback_calculator.css') }}">
+    {# MathJax configuration should be in base.html or loaded before main calculator JS if specific to page #}
+    {# Assuming MathJax basic config is in base.html or similar, or will be added if needed #}
+    <style>
+        /* Ketcher specific styles were here, can be moved to joback_calculator.css or kept if minimal */
+        #ketcherFrame {
+            width: 100%;
+            height: 55vh; /* From new CSS */
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+        .modal-dialog-ketcher {
+            max-width: 80%; /* From new CSS */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page-wrapper container py-5">
+    <header class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Joback Method for Critical Properties</h1>
+        <p class="lead text-muted">Estimate T<sub>c</sub>, P<sub>c</sub>, and V<sub>c</sub> using the Joback group contribution method.</p>
+    </header>
+
+    <form id="joback_form" autocomplete="off">
+        <div class="row gy-4">
+            <!-- Input Column -->
+            <div class="col-lg-7">
+                <div class="row gy-4">
+
+                    <!-- Molecule Identification Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm molecule-id-card">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-atom me-2 text-primary"></i>Molecule Identification</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="smiles_input_joback" class="form-label">SMILES String</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="smiles_input_joback" placeholder="e.g., CCO (Ethanol)" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="drawMoleculeBtn" data-bs-toggle="modal" data-bs-target="#ketcherModal" title="Draw Molecule">
+                                            <i class="fas fa-pencil-ruler me-1"></i> Draw
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="chemicalNameInput" class="form-label">Chemical Name</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="chemicalNameInput" placeholder="e.g., Ethanol, Benzene">
+                                        <button class="btn btn-outline-primary" type="button" id="getNameSmilesBtn"><i class="fas fa-search me-1"></i> Get SMILES</button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="popularMoleculeSelect" class="form-label">Popular Molecule</label>
+                                    <select class="form-select" id="popularMoleculeSelect">
+                                        <option value="" selected>-- Select from list --</option>
+                                        {# Options populated by JS #}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="formulaInput" class="form-label">Chemical Formula</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="formulaInput" placeholder="e.g., C2H5OH (for lookup)">
+                                        <button class="btn btn-outline-secondary" type="button" id="loadFormulaBtn"><i class="fas fa-atom me-1"></i> Load Formula</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Normal Boiling Point (Tb) Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-thermometer-half me-2 text-primary"></i>Normal Boiling Point (T<sub>b</sub>)</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <label for="Tb_joback" class="form-label">T<sub>b</sub> Value</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="Tb_joback" step="any" placeholder="e.g., 351.5" required>
+                                    <select class="form-select input-unit-select" id="Tb_joback_unit">
+                                        <option value="K" selected>K</option>
+                                        <option value="C">°C</option>
+                                        <option value="F">°F</option>
+                                    </select>
+                                    <button class="btn btn-info" type="button" id="estimateTbBtnJoback" title="Estimate Tb from SMILES structure (if SMILES is provided)">
+                                        <i class="fas fa-magic me-1"></i> Estimate T<sub>b</sub>
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">Required for Joback method. Can be estimated if SMILES is provided.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tb Estimation Details Card (Conditional) -->
+                    <div class="col-md-12" id="jobackTbEstimationCardWrapper" style="display: none;">
+                        <div class="card input-card shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-calculator me-2 text-info"></i>T<sub>b</sub> Estimation Details</h5>
+                            </div>
+                            <div class="card-body p-3">
+                                <div id="joback_tb_estimation_latex_steps" class="mathjax-container p-3 border rounded" style="min-height: 50px; font-size: 0.9rem; max-height: 200px; overflow-y: auto;">
+                                    T<sub>b</sub> estimation steps will appear here.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="col-md-12 d-flex justify-content-start gap-2 mt-4 action-buttons">
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-cogs me-2"></i>Calculate Critical Properties</button>
+                        <button type="reset" class="btn btn-outline-secondary btn-lg"><i class="fas fa-undo me-2"></i>Reset Fields</button>
+                    </div>
+                    
+                    <!-- Error Display Area -->
+                    <div class="col-md-12 mt-3">
+                        <div id="joback-warning-display" class="alert alert-danger" style="display:none;"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Output Column -->
+            <div class="col-lg-5">
+                <div class="sticky-lg-top" style="top: 100px;">
+                    <!-- Results Card -->
+                    <div class="card output-card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0 card-title-custom"><i class="fas fa-check-circle me-2"></i>Results</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div id="joback_results_placeholder" class="result-placeholder fs-5 text-muted text-center">
+                                Enter SMILES & T<sub>b</sub>, then click 'Calculate' to see results.
+                            </div>
+                            <div id="joback_results_content" style="display:none;">
+                                <div class="row g-3">
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_tc_joback" class="form-label">Critical Temperature (T<sub>c</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_tc_joback" class="form-control result-value">---</span>
+                                            <select id="outputUnit_tc_joback" class="form-select output-unit-select">
+                                                <option value="K" selected>K</option><option value="C">°C</option><option value="F">°F</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_pc_joback" class="form-label">Critical Pressure (P<sub>c</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_pc_joback" class="form-control result-value">---</span>
+                                            <select id="outputUnit_pc_joback" class="form-select output-unit-select">
+                                                <option value="bar" selected>bar</option><option value="atm">atm</option><option value="Pa">Pa</option><option value="kPa">kPa</option><option value="psi">psi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_vc_joback" class="form-label">Critical Volume (V<sub>c</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_vc_joback" class="form-control result-value">---</span>
+                                            <select id="outputUnit_vc_joback" class="form-select output-unit-select">
+                                                <option value="cm3/mol" selected>cm³/mol</option><option value="m3/mol">m³/mol</option><option value="L/mol">L/mol</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="my-3">
+                                <button class="btn btn-secondary w-100 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#jobackLatexStepsContent" aria-expanded="false" aria-controls="jobackLatexStepsContent">
+                                    <i class="fas fa-stream me-2"></i>Show/Hide Calculation Steps
+                                </button>
+                                <div class="collapse" id="jobackLatexStepsContent">
+                                    <div id="joback_latex_steps" class="mathjax-container p-3 border rounded" style="min-height: 100px; max-height: 300px; overflow-y: auto;">
+                                        Step-by-step calculation details will appear here.
+                                    </div>
+                                    <button type="button" id="copy_latex_btn_joback" class="btn btn-outline-primary btn-sm mt-2 w-100"><i class="fas fa-copy me-2"></i>Copy LaTeX Steps</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supporting Information Accordion -->
+                    <div class="accordion shadow-sm" id="jobackSupportingInfoAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="jobackHeadingCitation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#jobackCollapseCitation" aria-expanded="false" aria-controls="jobackCollapseCitation">
+                                    <i class="fas fa-book-reader me-2 text-primary"></i>Citation (Original Paper)
+                                </button>
+                            </h2>
+                            <div id="jobackCollapseCitation" class="accordion-collapse collapse" aria-labelledby="jobackHeadingCitation" data-bs-parent="#jobackSupportingInfoAccordion">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select id="paper_citation_format_joback" class="form-select form-select-sm w-auto">
+                                            <option value="Default" selected>Default</option><option value="APA">APA</option><option value="ACS">ACS</option><option value="BibTeX">BibTeX</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy_citation_btn_joback"><i class="fas fa-copy me-2"></i>Copy</button>
+                                    </div>
+                                    <p id="joback_citation_display" class="small text-muted" style="min-height: 2.5em; padding-top: 0.5em;">Paper citation will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="jobackHeadingToolCitation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#jobackCollapseToolCitation" aria-expanded="false" aria-controls="jobackCollapseToolCitation">
+                                    <i class="fas fa-laptop-code me-2 text-primary"></i>Cite This Tool
+                                </button>
+                            </h2>
+                            <div id="jobackCollapseToolCitation" class="accordion-collapse collapse" aria-labelledby="jobackHeadingToolCitation" data-bs-parent="#jobackSupportingInfoAccordion">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select id="tool_citation_format_joback" class="form-select form-select-sm w-auto">
+                                            <option value="Default" selected>Default</option><option value="APA">APA</option><option value="ACS">ACS</option><option value="BibTeX">BibTeX</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy_tool_citation_btn_joback"><i class="fas fa-copy me-2"></i>Copy</button>
+                                    </div>
+                                    <p id="joback_tool_citation_display" class="small text-muted" style="min-height: 2.5em; padding-top: 0.5em;">Tool citation will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="jobackHeadingApplicability">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#jobackCollapseApplicability" aria-expanded="false" aria-controls="jobackCollapseApplicability">
+                                    <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Applicability Notes
+                                </button>
+                            </h2>
+                            <div id="jobackCollapseApplicability" class="accordion-collapse collapse" aria-labelledby="jobackHeadingApplicability" data-bs-parent="#jobackSupportingInfoAccordion">
+                                <div class="accordion-body">
+                                    <p id="joback_applicability_notes" class="small text-muted">Applicability notes will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div> <!-- End Main Container -->
+
+<!-- Ketcher Modal -->
+<div class="modal fade" id="ketcherModal" tabindex="-1" aria-labelledby="ketcherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-ketcher">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ketcherModalLabel"><i class="fas fa-drafting-compass me-2"></i>Draw Chemical Structure</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-2"> {# Reduced padding for iframe to be closer to edges #}
+                <iframe id="ketcherFrame" src="{{ url_for('static', filename='ketcher-standalone-3.2.0/standalone/index.html') }}"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="useStructureBtn"><i class="fas fa-check me-1"></i>Use This Structure</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax-script" async></script>
+    <script src="{{ url_for('static', filename='js/joback_calculator.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,65 @@
+/* static/css/category_page.css */
+
+.category-page-wrapper {
+    padding-top: 2rem; /* Adjusted for overall page spacing */
+    padding-bottom: 3rem; /* Adjusted for overall page spacing */
+}
+
+.category-page-wrapper .category-page-header {
+    padding-top: 1.5rem; /* Adjusted */
+    padding-bottom: 1.5rem; /* Adjusted */
+    background-color: #f8f9fa; /* Similar to solver suite header, or choose a different one */
+    border-radius: 0.75rem;
+    margin-bottom: 2rem; /* Spacing below header */
+}
+
+.category-page-wrapper .display-5 {
+    color: #0a58ca; /* Consistent with solver suite */
+}
+
+.category-page-wrapper .lead {
+    font-size: 1.15rem;
+}
+
+.breadcrumb {
+    font-size: 0.9rem;
+    margin-bottom: 2.5rem; /* Spacing below breadcrumbs and above cards */
+}
+
+.breadcrumb-item a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+/* Ensure cards in the grid take up full height of their flex container row if needed */
+.category-page-wrapper .row.gy-4 .col-lg-4,
+.category-page-wrapper .row.gy-4 .col-md-6 {
+    display: flex; /* Ensures d-flex on parent is effective */
+}
+
+/* Card styling adjustments for category page if different from solver suite */
+/* Assuming .solver-category-card from solver_suite_page.css provides base */
+/* Example: if cards here need slightly different padding or title size */
+.category-page-wrapper .solver-category-card .card-body {
+    padding: 1.5rem; /* Can adjust if needed */
+}
+
+.category-page-wrapper .solver-category-card .card-title {
+    font-size: 1.25rem; /* Can adjust if needed */
+}
+
+/* Making sure the card icon is centered and has some top margin if not directly handled by card-body flex */
+.category-page-wrapper .solver-category-card .card-icon {
+    margin-bottom: 0.75rem; /* Overrides or complements existing margin */
+}
+
+/* Override animation-related styles from solver_suite_page.css for static display on this page */
+.category-page-wrapper .solver-category-card {
+    opacity: 1; /* Ensure cards are visible */
+    transform: translateX(0); /* Reset any transform */
+    /* If you want the fade-in animation on load for these too, you'd need JS */
+} 

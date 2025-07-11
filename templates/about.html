@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Our Mission & Story | About ToriCalc{% endblock %}
+
+{% block head_extra %}
+    {# Note: about_page.css is now linked globally in base.html, so this specific link isn't strictly needed here if only about.html uses it. #}
+    {# However, keeping it here ensures styles are applied if base.html changes or if this page is rendered standalone. #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about_page.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="about-page-wrapper">
+
+    <!-- Page Header Section -->
+    <section class="page-header-section text-center py-5 bg-light anim-target-js">
+        <div class="container">
+            <h1 class="page-main-title display-4 fw-bold">Driven by Discovery: The ToriCalc Story</h1>
+            <p class="lead text-muted">Unveiling the passion, purpose, and principles behind ToriCalc.</p>
+        </div>
+    </section>
+
+    <!-- Section 1: Our Mission -->
+    <section class="mission-section py-5 anim-target-js">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 anim-target-js">
+                    <h2 class="section-title display-5 fw-bold mb-4">Making Complex Chemical Engineering Accessible</h2>
+                    <p class="fs-5 mb-3">Empirical study in chemical engineering shouldn't be an insurmountable barrier. ToriCalc is born from the conviction that complex calculations can be made straightforward, transparent, and empowering for everyone.</p>
+                    <p class="fs-5 mb-3"><strong>Our unique approach:</strong> ToriCalc doesn't just provide answers; we offer step-by-step solutions, often in clear LaTeX format. This empowers you to truly learn, understand the underlying methodologies, and confidently apply these critical methods in your academic and professional endeavors.</p>
+                    <p class="fs-5">Chemical engineering stands on the shoulders of giants and countless empirical studies. We are dedicated to meticulously translating solvers from these vital research papers and foundational textbooks, making them widely accessible and ensuring every contribution is recognized and leveraged for future learning and innovation.</p>
+                </div>
+                <div class="col-lg-5 text-center anim-target-js">
+                    {# Placeholder for a relevant image or graphic - e.g., abstract scientific, flow diagram #}
+                    <img src="{{ url_for('static', filename='images/mission_graphic.png') }}" alt="Empowering Chemical Engineers" class="img-fluid rounded shadow-sm" style="max-height: 350px; /* Placeholder style */">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: The Spark -->
+    <section class="spark-section py-5 bg-gradient-light-blue anim-target-js">
+        <div class="container text-center">
+            <h2 class="section-title display-5 fw-bold mb-4">A Dedication Born from Universitas Indonesia</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <p class="fs-5 mb-3">ToriCalc's foundation lies in a profound appreciation for empirical study, cultivated through the rigorous and inspiring learning process at <strong>Universitas Indonesia</strong>. The challenging yet rewarding academic environment there was the crucible where this vision was forged.</p>
+                    <p class="fs-5">This journey ignited a passion not just for mastering these intricate chemical engineering principles, but for creating a universally accessible tool. ToriCalc embodies the ambition to democratize knowledge, empowering students, researchers, and professionals in chemical engineering across the globe with the confidence to tackle complex problems.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Our Core Values -->
+    <section class="core-values-section py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5 display-5 fw-bold anim-target-js">Guided by Principle</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-6 col-lg-4 d-flex anim-target-js value-card-wrapper">
+                    <div class="value-card feature-card text-center p-4 flex-fill h-100">
+                        <div class="value-icon feature-icon mb-3">
+                            <i class="fas fa-hand-holding-heart fa-3x"></i> <!-- Icon for Free for All -->
+                        </div>
+                        <h3 class="value-title feature-title h5 fw-bold mb-2">Free for All</h3>
+                        <p class="value-description feature-description text-muted">We firmly believe that essential engineering tools and knowledge should be available to everyone, everywhere, without financial barriers. ToriCalc is, and always will be, completely free to use.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 d-flex anim-target-js value-card-wrapper">
+                    <div class="value-card feature-card text-center p-4 flex-fill h-100">
+                        <div class="value-icon feature-icon mb-3">
+                            <i class="fas fa-book-open fa-3x"></i> <!-- Icon for Openness -->
+                        </div>
+                        <h3 class="value-title feature-title h5 fw-bold mb-2">Openness & Transparency</h3>
+                        <p class="value-description feature-description text-muted">Transparency is fundamental to learning and trust. We champion openness—from our commitment to open-source code (where applicable) to providing clear, step-by-step methodologies for every calculation.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 d-flex anim-target-js value-card-wrapper">
+                    <div class="value-card feature-card text-center p-4 flex-fill h-100">
+                        <div class="value-icon feature-icon mb-3">
+                            <i class="fas fa-users fa-3x"></i> <!-- Icon for Community Driven -->
+                        </div>
+                        <h3 class="value-title feature-title h5 fw-bold mb-2">Community Driven</h3>
+                        <p class="value-description feature-description text-muted">ToriCalc is built for the chemical engineering community, by a member of it. Our aim is to serve, support, and evolve based on the feedback and needs of students, educators, and professionals in the field.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: The Future of ToriCalc -->
+    <section class="future-section py-5 bg-light anim-target-js">
+        <div class="container text-center">
+             <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="section-title display-5 fw-bold mb-4">Constantly Evolving, Always Improving</h2>
+                    <p class="fs-5 mb-3">Our journey with ToriCalc is one of continuous growth and relentless improvement. We are passionately committed to expanding our library of solvers, drawing from the rich and ever-evolving landscape of chemical engineering research. New methodologies, refined models, and broader applications are always on our horizon.</p>
+                    <p class="fs-5">The vision extends further: to develop a comprehensive suite of 'ChemE Tools'—practical, powerful software and resources designed to directly support and enhance the work and studies of chemical engineering students and professionals worldwide. From data analysis aids to process simulation utilities, we aim to equip the next generation of engineers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Call to Action (CTA) -->
+    <section class="cta-section text-center py-5 anim-target-js">
+        <div class="container">
+            <h2 class="cta-headline display-5 fw-bold mb-4">Ready to Explore ToriCalc?</h2>
+            <p class="lead text-muted mb-4">Dive into our suite of calculators and experience the clarity ToriCalc offers.</p>
+            <a class="btn btn-primary btn-lg hero-cta px-5 py-3 fs-5 fw-semibold" href="{{ url_for('calculators_landing_page') }}" role="button">START USE NOW!</a>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const animatedElements = document.querySelectorAll('.anim-target-js');
+    const valueCards = document.querySelectorAll('.value-card-wrapper'); // Specific selector for value cards for staggering
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1 // At least 10% visible
+    };
+
+    const observerCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Observe general animated elements
+    animatedElements.forEach(el => {
+        if (!el.classList.contains('value-card-wrapper')) { // Exclude value cards as they have specific staggered animation
+            observer.observe(el);
+        }
+    });
+
+    // Observe value cards with staggered delay
+    valueCards.forEach((card, index) => {
+        card.style.transitionDelay = (index * 0.15) + 's'; 
+        observer.observe(card); 
+    });
+});
+</script>
+{% endblock %}

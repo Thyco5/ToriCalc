@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}Lee-Kesler Acentric Factor Calculator | ToriCalc{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calculator_page.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 calculator-container">
+
+    <!-- Header & Breadcrumb -->
+    <header class="text-center mb-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center">
+                <li class="breadcrumb-item"><a href="{{ url_for('calculators_landing_page') }}">ToriCalc Solver Suite</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('acentric_factor.acentric_factor_page') }}">Acentric Factor</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Lee-Kesler Method</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold">Lee-Kesler Acentric Factor Calculator</h1>
+        <p class="lead text-muted">Calculate the acentric factor (ω) from critical properties and the normal boiling point.</p>
+    </header>
+
+    <div class="row g-5">
+        <!-- Input Column -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm calculator-input-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-keyboard me-2"></i>Required Properties</h5>
+                </div>
+                <div class="card-body">
+                    <form id="lk-omega-form">
+                        <!-- Error Message Container -->
+                        <div id="lk-error-container" class="alert alert-danger" style="display: none;"></div>
+
+                        <!-- Input 1: Normal Boiling Point -->
+                        <div class="mb-3">
+                            <label for="boiling-point" class="form-label">Normal Boiling Point (T<sub>b</sub>)</label>
+                            <div class="input-group">
+                                <input type="text" inputmode="decimal" class="form-control" id="boiling-point" placeholder="e.g., 373.15" required>
+                                <select class="form-select" id="boiling-point-units">
+                                    <option value="K" selected>K</option>
+                                    <option value="C">°C</option>
+                                    <option value="F">°F</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Input 2: Critical Temperature -->
+                        <div class="mb-3">
+                            <label for="critical-temp" class="form-label">Critical Temperature (T<sub>c</sub>)</label>
+                            <div class="input-group">
+                                <input type="text" inputmode="decimal" class="form-control" id="critical-temp" placeholder="e.g., 647.1" required>
+                                <select class="form-select" id="critical-temp-units">
+                                    <option value="K" selected>K</option>
+                                    <option value="C">°C</option>
+                                    <option value="F">°F</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Input 3: Critical Pressure -->
+                        <div class="mb-4">
+                            <label for="critical-pressure" class="form-label">Critical Pressure (P<sub>c</sub>)</label>
+                            <div class="input-group">
+                                <input type="text" inputmode="decimal" class="form-control" id="critical-pressure" placeholder="e.g., 220.64" required>
+                                <select class="form-select" id="critical-pressure-units">
+                                    <option value="bar" selected>bar</option>
+                                    <option value="Pa">Pa</option>
+                                    <option value="kPa">kPa</option>
+                                    <option value="atm">atm</option>
+                                    <option value="psi">psi</option>
+                                </select>
+                            </div>
+                            <div class="form-text">The backend API requires Pc in Pascals (Pa). Conversion is handled automatically.</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-calculator me-2"></i>Calculate Acentric Factor</button>
+                            <button type="reset" class="btn btn-secondary"><i class="fas fa-undo me-2"></i>Reset Fields</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Column -->
+        <div class="col-lg-6">
+            <!-- Result Card -->
+            <div class="card shadow-sm calculator-output-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-poll me-2"></i>Result</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center" id="result-container" style="display: none;">
+                        <p class="fs-6 text-muted mb-1">Calculated Acentric Factor (ω)</p>
+                        <p class="display-4 fw-bold text-primary" id="omega-result">--</p>
+                        <p class="text-muted" id="result-source-text">Source: --</p>
+                    </div>
+                    <div class="text-center" id="placeholder-container">
+                        <p class="text-muted">Your result will be displayed here.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calculation Steps Card -->
+            <div id="calculation-steps-card" class="card shadow-sm calculator-output-card mb-4" style="display: none;">
+                <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseSteps" role="button" aria-expanded="true" aria-controls="collapseSteps">
+                    <h5 class="mb-0"><i class="fas fa-stream me-2"></i>Calculation Steps</h5>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="collapse show" id="collapseSteps">
+                    <div class="card-body">
+                        <div id="steps-container" class="latex-output"></div>
+                        <button class="btn btn-sm btn-outline-secondary mt-3" id="copy-latex-btn" style="display: none;">
+                            <i class="fas fa-copy me-2"></i>Copy LaTeX
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supporting Information Accordion -->
+            <div class="accordion" id="supportingInfoAccordion">
+                <!-- Citations -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingCitations">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCitations" aria-expanded="false" aria-controls="collapseCitations">
+                            <i class="fas fa-book-open me-2"></i>Citations
+                        </button>
+                    </h2>
+                    <div id="collapseCitations" class="accordion-collapse collapse" aria-labelledby="headingCitations" data-bs-parent="#supportingInfoAccordion">
+                        <div class="accordion-body" id="citations-content">
+                            
+                            <div id="tool-citation-container"></div>
+
+                            <div class="citation-controls mt-3 mb-2">
+                                <span class="me-2">Format:</span>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-primary format-btn active" data-format="default">Default</button>
+                                    <button type="button" class="btn btn-outline-primary format-btn" data-format="apa">APA</button>
+                                    <button type="button" class="btn btn-outline-primary format-btn" data-format="bibtex">BibTeX</button>
+                                </div>
+                            </div>
+                            <hr>
+                            <div id="source-citations-container">
+                                <p class="text-muted small">Source citations will appear here after calculation.</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Cite This Tool -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingCiteTool">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCiteTool" aria-expanded="false" aria-controls="collapseCiteTool">
+                            <i class="fas fa-quote-right me-2"></i>Cite This Tool
+                        </button>
+                    </h2>
+                    <div id="collapseCiteTool" class="accordion-collapse collapse" aria-labelledby="headingCiteTool" data-bs-parent="#supportingInfoAccordion">
+                        <div class="accordion-body">
+                           <p>Torikh, M. (2024). ToriCalc Chemical Engineering Solvers (Version 1.0) [Software]. Retrieved from [Your URL Here]</p>
+                           <button class="btn btn-sm btn-outline-secondary" id="copy-citation-tool-btn"><i class="fas fa-copy me-2"></i>Copy Citation</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Applicability Notes -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingNotes">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotes" aria-expanded="false" aria-controls="collapseNotes">
+                           <i class="fas fa-info-circle me-2"></i>Applicability Notes
+                        </button>
+                    </h2>
+                    <div id="collapseNotes" class="accordion-collapse collapse" aria-labelledby="headingNotes" data-bs-parent="#supportingInfoAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>The Lee-Kesler correlation is a three-parameter corresponding states principle, providing good estimates for nonpolar or slightly polar fluids.</li>
+                                <li>Accuracy may be reduced for highly polar, hydrogen-bonding, or complex molecules.</li>
+                                <li>The method relies on accurate experimental data for T<sub>b</sub>, T<sub>c</sub>, and P<sub>c</sub>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+  // This config tells MathJax to look for a function called 'myMathJaxStartup'
+  // and run it when MathJax is ready.
+  window.MathJax = {
+    startup: {
+      ready: () => {
+        console.log('MathJax is loaded and ready.');
+        window.MathJax.startup.defaultReady();
+        // Create a custom event to signal that MathJax is ready for our main script
+        document.body.dispatchEvent(new Event('mathjax-ready'));
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<script src="{{ url_for('static', filename='js/lk_acentric_factor_calculator.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+{% endblock %} 

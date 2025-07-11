@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Ideal Gas Properties Calculator{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h1>Ideal Gas Properties</h1>
+        <p class="lead">Calculate heat capacity, enthalpy, and entropy for gases in their ideal state.</p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3>Ideal Gas Heat Capacity (C<sub>p</sub><sup>ig</sup>) Coefficient Finder</h3>
+        </div>
+        <div class="card-body">
+            <p>Find the <strong>Poling Polynomial</strong> coefficients for a chemical from the `chemicals` library database.</p>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="name-input-cp" placeholder="Enter chemical name (e.g., methane)...">
+                <button class="btn btn-primary" id="find-btn-cp">Find Coefficients</button>
+            </div>
+            <div id="results-container-cp"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const findButton = document.getElementById('find-btn-cp');
+    const nameInput = document.getElementById('name-input-cp');
+    const resultsContainer = document.getElementById('results-container-cp');
+
+    async function findCoeffs() {
+        const chemicalName = nameInput.value.trim();
+        if (!chemicalName) {
+            resultsContainer.innerHTML = `<div class="alert alert-warning">Please enter a chemical name.</div>`;
+            return;
+        }
+        resultsContainer.innerHTML = '<div class="d-flex align-items-center"><div class="spinner-border spinner-border-sm me-2"></div>Searching...</div>';
+        findButton.disabled = true;
+
+        try {
+            const response = await fetch('/api/ideal_gas/get_cp_coeffs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chemical_name: chemicalName })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+
+            let resultsHtml = `
+                <h5 class="mt-4">Results for: <strong>${data.chemical_name}</strong></h5>
+                <p>The Poling polynomial is of the form: <br>
+                <strong>C<sub>p</sub> / R = a + bT + cT² + dT³ + eT⁴</strong></p>
+                
+                <h6>Coefficients for Range (${data.T_low} K to ${data.T_high} K)</h6>
+                <table class="table table-sm table-bordered table-responsive">
+                    <thead class="table-light"><tr><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th></tr></thead>
+                    <tbody><tr>
+                        <td>${data.coeffs[0].toExponential(4)}</td>
+                        <td>${data.coeffs[1].toExponential(4)}</td>
+                        <td>${data.coeffs[2].toExponential(4)}</td>
+                        <td>${data.coeffs[3].toExponential(4)}</td>
+                        <td>${data.coeffs[4].toExponential(4)}</td>
+                    </tr></tbody>
+                </table>
+            `;
+            resultsContainer.innerHTML = resultsHtml;
+
+        } catch (err) {
+            resultsContainer.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+        } finally {
+            findButton.disabled = false;
+        }
+    }
+
+    findButton.addEventListener('click', findCoeffs);
+    nameInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') findCoeffs(); });
+});
+</script>
+{% endblock %}

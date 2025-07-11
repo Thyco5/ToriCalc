@@ -1,0 +1,314 @@
+/* static/css/homepage.css */
+
+/* --- General Homepage Styles --- */
+body {
+    /* Ensure Inter font is applied if not already default from base.html or style.css */
+    font-family: 'Inter', sans-serif;
+    color: #212529; /* Default dark text */
+    background-color: #fdfdff; /* Very light off-white for the page body */
+}
+
+.homepage-wrapper .section-title {
+    color: #343a40;
+    margin-bottom: 3rem; /* Standardized bottom margin for section titles */
+}
+
+/* --- On-Scroll Animation Base Styles --- */
+.animate-on-scroll {
+    opacity: 0;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.animate-on-scroll.fade-in {
+    transform: translateY(20px); /* Start slightly lower */
+}
+
+.animate-on-scroll.fade-in-up {
+    transform: translateY(40px); /* Start a bit lower for a gentle slide-up */
+}
+
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    position: relative; /* For positioning the background pattern */
+    padding: 7rem 0 8rem; /* Increased padding */
+    background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%); /* Brighter, more distinct blue gradient */
+    overflow: hidden; /* Ensure pseudo-elements don't overflow */
+}
+
+.hero-background-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a0d2eb' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    /* A subtle geometric pattern, opacity controlled by fill-opacity in SVG */
+    z-index: 0;
+}
+
+.hero-section .hero-content-container {
+    position: relative; /* To ensure content is above the pattern */
+    z-index: 1;
+    max-width: 800px;
+}
+
+.hero-headline {
+    color: #1d3557; /* Darker, more impactful blue */
+    font-weight: 800; /* Extra bold */
+    letter-spacing: -0.5px;
+}
+
+.hero-subheadline {
+    color: #455a64; /* Slightly desaturated blue-gray */
+    font-size: 1.3rem; /* Slightly larger */
+}
+
+.hero-cta {
+    background: linear-gradient(to right, #007bff, #0056b3); /* Original gradient */
+    /* background-color: #007bff; */ 
+    border: none; /* Remove border for a cleaner look with gradient */
+    /* color: #fff; */
+    box-shadow: 0 4px 20px rgba(0, 123, 255, 0.35);
+    transition: transform 0.2s ease-out, box-shadow 0.3s ease-out, background-color 0.2s ease-out;
+}
+
+.hero-cta:hover {
+    /* background: linear-gradient(to right, #0069d9, #004aa0); */
+    background-color: #0069d9; 
+    /* border-color: #0062cc; */
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 25px rgba(0, 105, 217, 0.45);
+}
+
+/* --- Features/Benefits Section --- */
+.features-section {
+    background-color: #f8fafc; /* Light grey background for differentiation */
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.feature-card {
+    background-color: #fff;
+    border: 1px solid #e0e7ef; 
+    border-radius: 0.75rem; 
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border-color: #007bff;
+}
+
+.feature-icon {
+    color: #007bff; 
+}
+
+.feature-icon i {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon i {
+    transform: scale(1.1);
+}
+
+.feature-title {
+    color: #343a40;
+}
+
+.feature-description {
+    font-size: 0.95rem;
+}
+
+/* --- How It Works Section --- */
+.how-it-works-section {
+    background-color: #ffffff; /* White background */
+}
+
+.step-icon i {
+    color: #007bff; 
+    background-color: #e0f2fe;
+    padding: 1rem;
+    border-radius: 50%;
+    width: 70px; 
+    height: 70px; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,123,255,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.step-icon i:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.2);
+}
+
+/* --- Available Solver Categories Section --- */
+.solver-categories-section {
+    background-color: #f8fafc; /* Consistent light background */
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.scrollable-row {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #007bff #e9ecef; /* For Firefox - thumb and track */
+}
+
+.scrollable-row::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scrollable-row::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 10px;
+}
+
+.scrollable-row::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 10px;
+    border: 2px solid #e9ecef; /* Creates padding around thumb */
+}
+
+.category-card-link {
+    display: block; /* Ensure the link takes up the full card space for clickability */
+    transition: transform 0.2s ease-out;
+}
+
+.category-card-link:hover {
+    transform: translateY(-5px);
+}
+
+.category-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e7ef;
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    min-height: 220px; /* Ensure consistent height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+}
+
+.category-card-link:hover .category-card {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border-color: #0069d9; /* Slightly darker blue on hover */
+}
+
+.category-icon {
+    color: #007bff;
+    /* font-size: 2.5rem; /* Adjusted via fa-3x */
+}
+
+.category-title {
+    color: #2c3e50; /* Dark blue/charcoal for titles */
+}
+
+.category-tagline {
+    font-size: 0.9rem;
+}
+
+.placeholder-card {
+    border-style: dashed;
+    border-color: #ced4da;
+    opacity: 0.7;
+}
+
+.placeholder-card .category-icon {
+    color: #6c757d;
+}
+
+
+/* --- Footer Styling (from base.html context, for homepage.css consolidation if preferred) --- */
+/* Assuming .homepage-footer class is on footer in base.html */
+.homepage-footer {
+    /* background-color: #2c3e50; /* Dark blue-gray, if changed from base.html's bg-dark */
+    /* color: #e9ecef; /* Light text color */
+}
+
+.homepage-footer h5, .homepage-footer h6 {
+    color: #ffffff; /* Ensure headings are white on dark bg */
+}
+
+.homepage-footer .footer-link {
+    color: #adb5bd; /* Lighter grey for links */
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.homepage-footer .footer-link:hover {
+    color: #ffffff; /* White on hover */
+    text-decoration: underline !important;
+}
+
+.homepage-footer .small.text-muted {
+    color: #adb5bd !important; /* Ensure copyright text is also lighter */
+}
+
+.homepage-footer .border-secondary {
+    border-color: #495057 !important; /* Darker border for subtle separation */
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 991.98px) { /* lg breakpoint */
+    .hero-section {
+        padding: 5rem 0 6rem;
+    }
+    .hero-headline {
+        font-size: 2.8rem;
+    }
+    .hero-subheadline {
+        font-size: 1.15rem;
+    }
+    .scrollable-row .col-lg-4 {
+        flex: 0 0 auto;
+        width: calc(100% / 2.2); /* Show ~2.2 cards on tablets */
+    }
+}
+
+@media (max-width: 767.98px) { /* md breakpoint */
+    .hero-headline {
+        font-size: 2.2rem; 
+    }
+    .hero-subheadline {
+        font-size: 1.05rem;
+    }
+    .section-title {
+        font-size: 1.8rem;
+    }
+    .feature-card {
+        margin-bottom: 1.5rem; 
+    }
+    .scrollable-row .col-md-5, .scrollable-row .col-sm-6, .scrollable-row .col-11 {
+        flex: 0 0 auto;
+        width: calc(100% / 1.3); /* Show ~1.3 cards on mobile, allow peaking of next */
+    }
+    .category-card {
+        min-height: 200px;
+    }
+}
+
+@media (max-width: 575.98px) { /* sm breakpoint */
+    .hero-section {
+        padding: 4rem 0 5rem;
+    }
+    .hero-cta {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        font-size: 1rem; /* Bootstrap fs-6 equivalent */
+    }
+    .scrollable-row .col-11 {
+        width: 85%; /* Make cards slightly narrower than viewport width */
+    }
+} 

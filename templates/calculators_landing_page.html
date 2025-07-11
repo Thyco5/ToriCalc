@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Calculators | ToriCalc{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solver_suite_page.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Main Title and Subtitle -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">ToriCalc Solver Suite</h1>
+        <p class="lead text-muted">Your central hub for accessing specialized chemical engineering calculators.</p>
+    </div>
+
+    <div class="cards-scroller-container position-relative"> 
+        <button class="btn btn-scroller btn-scroller-prev shadow-sm" id="scrollPrevBtn" aria-label="Previous Solvers" disabled>
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="horizontal-scroll-wrapper pb-3" id="cardsScrollWrapper">
+            <div class="row flex-nowrap gx-4">
+                <!-- Diffusion Coefficients Card -->
+                <div class="col-auto">
+                    <div class="card solver-category-card shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon"><i class="fas fa-wind"></i></div> 
+                            <h5 class="card-title">Diffusion Coefficients</h5>
+                            <p class="card-text">Tools to estimate the rate of molecular diffusion in gases and liquids using established theoretical models like Chapman-Enskog and others.</p>
+                            <a href="{{ url_for('diffusion.chapman_enskog') }}" class="btn btn-primary"><i class="fas fa-rocket me-2"></i>Explore Diffusion Solvers</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Properties Card -->
+                <div class="col-auto">
+                    <div class="card solver-category-card shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon"><i class="fas fa-thermometer-half"></i></div> 
+                            <h5 class="card-title">Critical Properties</h5>
+                            <p class="card-text">Determine critical temperature (T<sub>c</sub>), pressure (P<sub>c</sub>), and volume (V<sub>c</sub>) of chemical compounds using various group contribution and empirical methods.</p>
+                            <a href="{{ url_for('critical_properties_solvers_page') }}" class="btn btn-primary"><i class="fas fa-cogs me-2"></i>Explore Critical Properties Solvers</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acentric Factor Card -->
+                <div class="col-auto">
+                    <div class="card solver-category-card shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon"><i class="fas fa-balance-scale-right"></i></div>
+                            <h5 class="card-title">Acentric Factor</h5>
+                            <p class="card-text">Estimate the acentric factor (ω), a measure of a fluid's non-sphericity, using corresponding states and group contribution methods.</p>
+                            <a href="{{ url_for('acentric_factor.acentric_factor_page') }}" class="btn btn-primary"><i class="fas fa-atom me-2"></i>Explore Acentric Factor Solvers</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase Equilibria Card (Soon) -->
+                <div class="col-auto">
+                    <div class="card solver-category-card shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon"><i class="fas fa-balance-scale"></i></div> 
+                            <h5 class="card-title">Phase Equilibria</h5>
+                            <p class="card-text">Analyze and predict vapor-liquid (VLE), liquid-liquid (LLE), and other multi-phase behavior for mixtures. <span class="fw-semibold">Coming soon!</span></p>
+                            <button class="btn btn-secondary disabled" disabled><i class="fas fa-hourglass-half me-2 coming-soon-icon"></i>Coming Soon</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thermodynamic Properties Card (Soon) -->
+                <div class="col-auto">
+                    <div class="card solver-category-card shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon"><i class="fas fa-fire"></i></div> 
+                            <h5 class="card-title">Thermodynamic Properties</h5>
+                            <p class="card-text">Calculate key thermodynamic data such as enthalpy, entropy, heat capacity, and Gibbs free energy for various substances. <span class="fw-semibold">Coming soon!</span></p>
+                            <button class="btn btn-secondary disabled" disabled><i class="fas fa-hourglass-half me-2 coming-soon-icon"></i>Coming Soon</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example for future expansion:
+                <div class="col-auto">
+                    <div class="card solver-category-card shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon"><i class="fas fa-flask"></i></div> 
+                            <h5 class="card-title">Reaction Engineering</h5>
+                            <p class="card-text">Tools for reactor design, kinetic analysis, and optimization of chemical reactions. <span class="fw-semibold">Coming soon!</span></p>
+                            <button class="btn btn-secondary disabled" disabled><i class="fas fa-hourglass-half me-2 coming-soon-icon"></i>Coming Soon</button>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+        <button class="btn btn-scroller btn-scroller-next shadow-sm" id="scrollNextBtn" aria-label="Next Solvers">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const scrollWrapper = document.getElementById('cardsScrollWrapper'); // Use ID
+    const prevBtn = document.getElementById('scrollPrevBtn');
+    const nextBtn = document.getElementById('scrollNextBtn');
+
+    function updateArrowStates() {
+        if (!scrollWrapper) return;
+        const maxScrollLeft = scrollWrapper.scrollWidth - scrollWrapper.clientWidth;
+        
+        // Tolerance for floating point issues
+        const tolerance = 1; 
+
+        if (scrollWrapper.scrollLeft <= tolerance) {
+            prevBtn.disabled = true;
+            prevBtn.classList.add('disabled'); // explicit class for styling if needed
+        } else {
+            prevBtn.disabled = false;
+            prevBtn.classList.remove('disabled');
+        }
+
+        if (scrollWrapper.scrollLeft >= maxScrollLeft - tolerance) {
+            nextBtn.disabled = true;
+            nextBtn.classList.add('disabled');
+        } else {
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('disabled');
+        }
+    }
+
+    if (scrollWrapper) {
+        scrollWrapper.addEventListener('wheel', function (e) {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                scrollWrapper.scrollLeft += e.deltaY;
+            }
+        });
+
+        // Listen to scroll events on the wrapper to update arrow states
+        scrollWrapper.addEventListener('scroll', updateArrowStates);
+        
+        // Initial state update
+        updateArrowStates(); 
+        // Update on window resize as clientWidth might change
+        window.addEventListener('resize', updateArrowStates);
+    }
+
+    if (prevBtn && nextBtn && scrollWrapper) {
+        const scrollAmount = () => {
+            // Scroll by the width of one card + its margin/gap
+            // This assumes all cards have similar effective widths
+            const firstCard = scrollWrapper.querySelector('.solver-category-card');
+            if (firstCard) {
+                const cardStyle = window.getComputedStyle(firstCard);
+                const cardMarginRight = parseFloat(cardStyle.marginRight);
+                return firstCard.offsetWidth + cardMarginRight;
+            }
+            return 300; // Fallback scroll amount
+        };
+
+        prevBtn.addEventListener('click', function() {
+            scrollWrapper.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', function() {
+            scrollWrapper.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+        });
+    }
+
+    // Intersection Observer for card animations
+    const cards = document.querySelectorAll('.solver-category-card');
+    const observerOptions = {
+        root: scrollWrapper,
+        rootMargin: '0px',
+        threshold: 0.1 
+    };
+
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            } else {
+                entry.target.classList.remove('is-visible');
+            }
+        });
+    }, observerOptions);
+
+    cards.forEach(card => {
+        observer.observe(card);
+    });
+});
+</script>
+{% endblock %} 

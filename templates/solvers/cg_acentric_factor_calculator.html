@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Acentric Factor (CG) Calculator{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <style>
+    .results-section h4 {
+      margin-top: 2rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 5px;
+    }
+    .loader-small {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+    .group-count-table {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .group-count-table th, .group-count-table td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h1>Acentric Factor (ω) Solvers</h1>
+            <p class="lead">Constantinou-Gani (CG) Group Contribution Method</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-primary text-white">
+            <h3>Constantinou-Gani (CG) Method</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="chemical-name-input-cg" class="form-label"><b>Enter Chemical Name or SMILES</b></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="chemical-name-input-cg" placeholder="e.g., 'ethanol', 'CCO', 'benzene', 'c1ccccc1'">
+                    <button class="btn btn-success" type="button" id="calculate-btn-cg">Calculate ω</button>
+                </div>
+                <div id="status-area" class="form-text mt-2"></div>
+            </div>
+
+            <div id="results-container-cg" class="mt-4" style="display:none;">
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const calculateButton = document.getElementById('calculate-btn-cg');
+    const nameInput = document.getElementById('chemical-name-input-cg');
+    const resultsContainer = document.getElementById('results-container-cg');
+    const statusArea = document.getElementById('status-area');
+    let rawLatexString = '';
+    let citations = [];
+
+    async function handleCgCalculation() {
+        const chemicalName = nameInput.value.trim();
+        if (!chemicalName) {
+            statusArea.textContent = 'Chemical name is required.';
+            statusArea.className = 'form-text text-danger';
+            return;
+        }
+        statusArea.innerHTML = '<div class="loader-small"></div> Calculating...';
+        statusArea.className = 'form-text text-muted';
+        resultsContainer.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/calculate_cg_omega', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chemical_name: chemicalName, calculation_order: '1' })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Calculation failed.');
+
+            statusArea.textContent = `Calculation complete for ${chemicalName} (SMILES: ${data.found_smiles}).`;
+            statusArea.className = 'form-text text-success';
+            resultsContainer.style.display = 'block';
+            
+            rawLatexString = data.latex_steps;
+            citations = data.citations || [];
+
+            let resultsHtml = `
+                <hr>
+                <div class="row">
+                    <div class="col-md-7">
+                        <h4>Result</h4>
+                        <div class="alert alert-success"><strong>Acentric Factor (ω):</strong> <span class="fw-bold">${data.omega}</span></div>
+                        <h4>Calculation Steps</h4>
+                        <div id="calculation-steps-container" class="p-3 border rounded bg-light">${data.plain_steps}</div>
+                        <button id="copy-latex-cg" class="btn btn-secondary btn-sm mt-2">Copy LaTeX</button>
+                    </div>
+                    <div class="col-md-5">
+                        <h4>Identified CG Groups</h4>
+                        <div id="group-contributions-container" class="p-3 border rounded mb-3"></div>
+                        <h4>Applicability Notes</h4>
+                        <div class="p-3 border rounded bg-light small">${data.applicability_notes || 'No notes available.'}</div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h4>Citations</h4>
+                        <div id="tool-citation-container"></div>
+                        <div class="citation-controls mt-2">
+                            <span>Format:</span>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-secondary format-btn active" data-format="default">Default</button>
+                                <button class="btn btn-outline-secondary format-btn" data-format="apa">APA</button>
+                                <button class="btn btn-outline-secondary format-btn" data-format="acs">ACS</button>
+                                <button class="btn btn-outline-secondary format-btn" data-format="bibtex">BibTeX</button>
+                            </div>
+                        </div>
+                        <div id="source-citations-container" class="mt-2"></div>
+                    </div>
+                </div>
+            `;
+            resultsContainer.innerHTML = resultsHtml;
+            
+            const stepsContainer = document.getElementById('calculation-steps-container');
+            const groupsContainer = document.getElementById('group-contributions-container');
+            
+            displayGroupCounts(data.first_order_groups, data.second_order_groups, groupsContainer);
+            displayCitations(document.querySelector('.format-btn.active').dataset.format);
+            
+            document.getElementById('copy-latex-cg').addEventListener('click', () => { if(rawLatexString) navigator.clipboard.writeText(rawLatexString); });
+            document.querySelectorAll('.citation-controls .format-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.citation-controls .format-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    displayCitations(button.dataset.format);
+                });
+            });
+
+             if (window.MathJax) {
+                 setTimeout(() => {
+                    stepsContainer.innerHTML = data.latex_steps;
+                    MathJax.typesetPromise([stepsContainer]).catch(console.error);
+                }, 10);
+            }
+        } catch (error) {
+            statusArea.textContent = `Error: ${error.message}`;
+            statusArea.className = 'form-text text-danger';
+        }
+    }
+    
+    function displayGroupCounts(firstOrder, secondOrder, container) {
+        let html = '';
+        if (Object.keys(firstOrder).some(k => firstOrder[k] > 0)) {
+            html += '<h6>First-Order</h6><table class="table table-sm"><tbody>';
+            for (const [group, count] of Object.entries(firstOrder)) { if (count > 0) html += `<tr><td>${group}</td><td><b>${count}</b></td></tr>`; }
+            html += '</tbody></table>';
+        }
+        if (Object.keys(secondOrder).some(k => secondOrder[k] > 0)) {
+             html += '<h6 class="mt-3">Second-Order</h6><table class="table table-sm"><tbody>';
+            for (const [group, count] of Object.entries(secondOrder)) { if (count > 0) html += `<tr><td>${group}</td><td><b>${count}</b></td></tr>`; }
+            html += '</tbody></table>';
+        }
+        container.innerHTML = html || '<p>No matching groups found.</p>';
+    }
+
+    const formatters = {
+        default: (cit) => {
+            const d = cit.data; let f = `<strong>[${cit.source_type}]</strong><br>${Array.isArray(d.authors) ? d.authors.join(', ') : d.author} (${d.year}). <em>${d.title}</em>.`;
+            if (d.journal) f += ` ${d.journal}, <strong>${d.volume}</strong>(${d.issue}), pp. ${d.pages}.`;
+            if (d.url) f += ` <a href="${d.url}" target="_blank">Source Link</a>`;
+            return `<div class="mb-2">${f}</div>`;
+        },
+        apa: (cit) => {
+            const d = cit.data; let f = `${Array.isArray(d.authors) ? d.authors.map(a => a.split(',').reverse().join(' ')).join(', ') : d.author} (${d.year}).`;
+            if (d.title) f += ` <em>${d.title}</em>.`;
+            if (d.journal) f += ` ${d.journal}, <em>${d.volume}</em>(${d.issue}), ${d.pages}.`;
+            else if (d.type === 'Software') f += ` [${d.type}].`;
+            if (d.url) f += ` ${d.url}`;
+            return `<p>${f}</p>`;
+        },
+        acs: (cit) => {
+            const d = cit.data;
+            let formatted = '';
+            if (d.authors) {
+                const authorStr = Array.isArray(d.authors) ? d.authors.join('; ') : d.author;
+                formatted += `${authorStr}. `;
+            } else {
+                formatted += `${d.author}. `;
+            }
+            
+            formatted += `${d.title}. `;
+
+            if (d.journal) {
+                formatted += `<em>${d.journal}</em> <strong>${d.year}</strong>, <em>${d.volume}</em>, ${d.pages}.`;
+            } else if (d.type === 'Software' || d.type === 'Tool') {
+                formatted += `[${d.type}] ${d.url} (accessed ${d.retrieved_date}).`;
+            }
+            return `<p class="citation-text">${formatted}</p>`;
+        },
+        bibtex: (cit) => {
+            const d = cit.data; let bib = `@${cit.type === 'Journal Article' ? 'article' : 'misc'}{${cit.id},\n  author  = {${Array.isArray(d.authors) ? d.authors.join(' and ') : `{${d.author}}`}},\n  title   = {${d.title}},\n  year    = {${d.year}}`;
+            if (d.journal) bib += `,\n  journal = {${d.journal}},\n  volume  = {${d.volume}},\n  pages   = {${d.pages}}`;
+            else if (d.url) bib += `,\n  url     = {${d.url}}`;
+            bib += `\n}`; return `<pre class="citation-bibtex">${bib}</pre>`;
+        }
+    };
+
+    function displayCitations(format = 'default') {
+        const toolContainer = document.getElementById('tool-citation-container');
+        const sourceContainer = document.getElementById('source-citations-container');
+        toolContainer.innerHTML = '';
+        sourceContainer.innerHTML = '';
+        if (!citations || citations.length === 0) return;
+        citations.forEach(cit => {
+            const formattedHtml = formatters[format](cit);
+            if (cit.source_type === 'Tool') toolContainer.innerHTML += formattedHtml;
+            else sourceContainer.innerHTML += formattedHtml;
+        });
+    }
+
+    calculateButton.addEventListener('click', handleCgCalculation);
+    nameInput.addEventListener('keyup', e => { if (e.key === 'Enter') handleCgCalculation(); });
+});
+</script>
+{% endblock %} 

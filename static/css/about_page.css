@@ -1,0 +1,190 @@
+/* static/css/about_page.css */
+
+/* --- General About Page Styles --- */
+.about-page-wrapper {
+    color: #343a40;
+}
+
+.about-page-wrapper .section-title {
+    color: #2c3e50;
+}
+
+.about-page-wrapper p {
+    line-height: 1.7;
+}
+
+/* --- Page Header Section --- */
+.page-header-section {
+    background-color: #f8f9fa;
+}
+
+.page-header-section .page-main-title {
+    color: #1d3557;
+}
+
+.page-header-section .lead {
+    font-size: 1.25rem;
+    color: #566573;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Mission Section --- */
+.mission-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background-color: #ffffff;
+}
+
+.mission-section .section-title {
+    margin-bottom: 1.5rem;
+}
+
+.mission-section img {
+    border: 5px solid #e0f2fe;
+}
+
+/* --- Spark Section --- */
+.spark-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background: linear-gradient(135deg, #edf6ff 0%, #fafdff 100%); 
+    color: #2c3e50;
+}
+
+.spark-section .section-title {
+    color: #1d3557;
+    margin-bottom: 1.5rem;
+}
+
+.spark-section strong {
+    color: #0056b3;
+}
+
+/* --- Core Values Section --- */
+.core-values-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background-color: #ffffff;
+}
+
+.core-values-section .value-card.feature-card {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s ease-out;
+    /* opacity and transform for animation are applied to .value-card-wrapper via .anim-target-js */
+}
+
+.core-values-section .value-card.feature-card:hover {
+    transform: translateY(-10px); /* More pronounced lift */
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1); /* Enhanced shadow */
+    border-color: #0056b3; /* Darker blue on hover */
+}
+
+.value-icon.feature-icon {
+    transition: transform 0.3s ease-out; /* For icon animation on hover */
+}
+
+.core-values-section .value-card.feature-card:hover .value-icon.feature-icon {
+    transform: scale(1.15); /* Icon scales up slightly */
+}
+
+/* --- Future Section --- */
+.future-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background-color: #f8f9fa;
+}
+
+.future-section .section-title {
+     margin-bottom: 1.5rem;
+}
+
+/* --- CTA Section --- */
+.cta-section {
+    padding-top: 4rem;
+    padding-bottom: 5rem;
+    background-color: #ffffff;
+}
+
+.cta-section .cta-headline {
+    color: #1d3557;
+}
+
+/* --- Animation Base Styles --- */
+.anim-target-js {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.anim-target-js.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Staggered Animation Delays (General Sections) --- */
+/* Header (page-header-section) - no delay, first to animate */
+.mission-section.anim-target-js {
+    transition-delay: 0.1s; /* Text block and image will share this or have sub-delays */
+}
+.mission-section .col-lg-7.anim-target-js {
+    transition-delay: 0.15s;
+}
+.mission-section .col-lg-5.anim-target-js {
+    transition-delay: 0.25s; /* Image slightly after text */
+}
+
+.spark-section.anim-target-js {
+    transition-delay: 0.1s; /* Delay based on previous section completion */
+}
+
+/* Core Values Section Title first */
+.core-values-section > .container > .anim-target-js.section-title {
+    transition-delay: 0.1s;
+}
+/* Value cards have their own JS-applied stagger, so their wrapper .anim-target-js doesn't need CSS delay here */
+
+.future-section.anim-target-js {
+    transition-delay: 0.1s;
+}
+
+.cta-section.anim-target-js {
+    transition-delay: 0.1s;
+}
+
+/* --- Responsive Adjustments for About Page --- */
+@media (max-width: 991.98px) { 
+    .mission-section .col-lg-5 img {
+        margin-top: 2rem; 
+    }
+}
+
+@media (max-width: 767.98px) { 
+    .page-header-section .page-main-title,
+    .about-page-wrapper .section-title {
+        font-size: 2.2rem; 
+    }
+    .mission-section .fs-5,
+    .spark-section .fs-5,
+    .future-section .fs-5 {
+        font-size: 1.05rem !important; 
+    }
+    .core-values-section .feature-card {
+        margin-bottom: 1.5rem; 
+    }
+    /* Ensure animation delays are not too long if sections stack early */
+    .mission-section .col-lg-5.anim-target-js {
+        transition-delay: 0.15s; /* Adjust delay for stacked view */
+    }
+}
+
+@media (max-width: 575.98px) { 
+    .page-header-section .page-main-title,
+    .about-page-wrapper .section-title {
+        font-size: 2rem;
+    }
+    .page-header-section .lead {
+        font-size: 1.1rem;
+    }
+}

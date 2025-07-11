@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block title %}Support ToriCalc{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sponsors_page.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="sponsors-page-wrapper container py-5">
+    <!-- Page Header -->
+    <header class="text-center mb-5 sponsors-page-header">
+        <h1 class="display-4 fw-bold">Support ToriCalc</h1>
+        <p class="lead text-muted mt-3">
+            Help us empower the next generation of chemical engineers and researchers by keeping ToriCalc accessible and innovative.
+        </p>
+    </header>
+
+    <!-- Section 1: Introduction / The Value of Your Support -->
+    <section class="support-intro-section py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{{ url_for('static', filename='images/placeholder_support_graphic.png') }}" alt="Supporting ToriCalc Illustration" class="img-fluid rounded shadow-sm">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-3">Help Us Keep ToriCalc Growing & Free</h2>
+                <p class="mb-3">
+                    ToriCalc is dedicated to providing high-quality, accessible chemical engineering tools for students, educators, and professionals worldwide. Our mission is to foster learning, streamline research, and support the open-access sharing of knowledge.
+                </p>
+                <p class="mb-0">
+                    Your generous sponsorship helps us maintain this vital platform, develop new cutting-edge solvers and educational resources, and ensures that ToriCalc remains a free and valuable asset for the global chemical engineering community. 
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Why Sponsor ToriCalc? -->
+    <section class="why-sponsor-section py-5 bg-light rounded">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Benefits of Sponsorship</h2>
+            <p class="lead text-muted">Make an impact and connect with a dedicated community.</p>
+        </div>
+        <div class="row gy-4">
+            <div class="col-md-6 col-lg-3 d-flex">
+                <div class="value-prop-card p-4 rounded shadow-sm text-center w-100">
+                    <div class="value-icon mb-3"><i class="fas fa-bullseye fa-2x text-primary"></i></div>
+                    <h5 class="fw-semibold mb-2">Visibility & Brand Alignment</h5>
+                    <p class="small">Exposure to a targeted audience of chemical engineering students, academics, and professionals.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 d-flex">
+                <div class="value-prop-card p-4 rounded shadow-sm text-center w-100">
+                    <div class="value-icon mb-3"><i class="fas fa-book-open fa-2x text-primary"></i></div>
+                    <h5 class="fw-semibold mb-2">Support Open Access & Education</h5>
+                    <p class="small">Demonstrate commitment to free educational resources and open science principles.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 d-flex">
+                <div class="value-prop-card p-4 rounded shadow-sm text-center w-100">
+                    <div class="value-icon mb-3"><i class="fas fa-users fa-2x text-primary"></i></div>
+                    <h5 class="fw-semibold mb-2">Community Engagement</h5>
+                    <p class="small">Play a role in empowering the global chemical engineering community through valuable tools.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 d-flex">
+                <div class="value-prop-card p-4 rounded shadow-sm text-center w-100">
+                    <div class="value-icon mb-3"><i class="fas fa-lightbulb fa-2x text-primary"></i></div>
+                    <h5 class "fw-semibold mb-2">Foster Innovation</h5>
+                    <p class="small">Contribute to the development and expansion of valuable engineering tools and resources.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: How to Sponsor / Get Involved -->
+    <section class="get-involved-section py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="fw-bold mb-3">Become a Valued Sponsor</h2>
+                <p class="lead mb-4">
+                    We are seeking partners who share our vision. Your support can make a significant difference.
+                </p>
+                <p class="mb-3">
+                    For sponsorship inquiries, package details, or to discuss custom partnership opportunities, please contact our team at:
+                    <br>
+                    <a href="mailto:torikhft2bioproses@gmail.com" class="fw-semibold fs-5">torikhft2bioproses@gmail.com</a>
+                </p>
+                <p class="text-muted small">
+                    We welcome financial contributions, academic collaborations, data partnerships, or other forms of support that align with our mission. Details on specific sponsorship tiers will be available soon.
+                </p>
+                <a href="mailto:torikhft2bioproses@gmail.com" class="btn btn-primary btn-lg mt-4">
+                    <i class="fas fa-envelope me-2"></i>Contact Us About Sponsorship
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Our Valued Sponsors & Supporters (Placeholder) -->
+    <section class="our-sponsors-section py-5 bg-light rounded">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Our Generous Supporters</h2>
+            <p class="lead text-muted">We are actively seeking partners to support ToriCalc's mission. Your logo and acknowledgment will be featured here.</p>
+        </div>
+
+        <!-- Tier Example: Platinum -->
+        <div class="sponsor-tier mb-5">
+            <h4 class="sponsor-tier-title text-center mb-4">Platinum Supporters</h4>
+            <div class="row justify-content-center align-items-center gy-4">
+                <div class="col-md-4 col-lg-3">
+                    <div class="sponsor-logo-placeholder p-4 border rounded text-center text-muted">
+                        <i class="fas fa-image fa-3x mb-2"></i><br>Your Logo Here
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="sponsor-logo-placeholder p-4 border rounded text-center text-muted">
+                        <i class="fas fa-image fa-3x mb-2"></i><br>Your Logo Here
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tier Example: Gold -->
+        <div class="sponsor-tier mb-5">
+            <h4 class="sponsor-tier-title text-center mb-4">Gold Supporters</h4>
+            <div class="row justify-content-center align-items-center gy-4">
+                <div class="col-md-3 col-lg-2">
+                    <div class="sponsor-logo-placeholder p-3 border rounded text-center text-muted small-logo">
+                        <i class="fas fa-image fa-2x mb-1"></i><br>Logo
+                    </div>
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <div class="sponsor-logo-placeholder p-3 border rounded text-center text-muted small-logo">
+                        <i class="fas fa-image fa-2x mb-1"></i><br>Logo
+                    </div>
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <div class="sponsor-logo-placeholder p-3 border rounded text-center text-muted small-logo">
+                        <i class="fas fa-image fa-2x mb-1"></i><br>Logo
+                    </div>
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <div class="sponsor-logo-placeholder p-3 border rounded text-center text-muted small-logo">
+                        <i class="fas fa-image fa-2x mb-1"></i><br>Logo
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tier Example: Community Champions -->
+        <div class="sponsor-tier">
+            <h4 class="sponsor-tier-title text-center mb-4">Community Champions</h4>
+            <div class="row justify-content-center align-items-center gy-3 gx-3">
+                <!-- Add more smaller placeholders here if needed -->
+                 <div class="col-auto">
+                    <div class="sponsor-logo-placeholder p-2 border rounded text-center text-muted very-small-logo">
+                        <i class="fas fa-medal fa-lg"></i><p class="mb-0 mt-1" style="font-size: 0.7rem;">Supporter Name</p>
+                    </div>
+                </div>
+                 <div class="col-auto">
+                    <div class="sponsor-logo-placeholder p-2 border rounded text-center text-muted very-small-logo">
+                        <i class="fas fa-medal fa-lg"></i><p class="mb-0 mt-1" style="font-size: 0.7rem;">Supporter Name</p>
+                    </div>
+                </div>
+                 <div class="col-auto">
+                    <div class="sponsor-logo-placeholder p-2 border rounded text-center text-muted very-small-logo">
+                        <i class="fas fa-medal fa-lg"></i><p class="mb-0 mt-1" style="font-size: 0.7rem;">Supporter Name</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const animatedElements = document.querySelectorAll(
+        '.sponsors-page-header, '
+        + '.support-intro-section .row > div, '
+        + '.why-sponsor-section .text-center, '
+        /* Note: .value-prop-card handled separately for stagger */ 
+        + '.get-involved-section .row > div, '
+        + '.our-sponsors-section .text-center, '
+        + '.sponsor-tier'
+    );
+
+    const benefitCards = document.querySelectorAll('.value-prop-card');
+
+    const observerOptions = {
+        root: null, // relative to document viewport 
+        rootMargin: '0px',
+        threshold: 0.1 // trigger when 10% of the element is visible
+    };
+
+    const observerCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target); // Optional: stop observing after animation
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    animatedElements.forEach(el => {
+        observer.observe(el);
+    });
+
+    // Staggered animation for benefit cards
+    benefitCards.forEach((card, index) => {
+        // Add delay class directly - CSS handles the transition-delay
+        // card.classList.add('delay-' + (index + 1)); // Assumes max 4 cards for predefined delays
+        // Alternatively, set style directly if more dynamic or more cards:
+        card.style.transitionDelay = (index * 0.15) + 's'; 
+        observer.observe(card); // Also observe these cards
+    });
+});
+</script>
+{% endblock %}

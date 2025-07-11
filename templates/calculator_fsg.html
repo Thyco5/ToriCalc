@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Fuller–Schettler–Giddings Diffusion Calculator | ChemE Calc{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Fuller–Schettler–Giddings Diffusion Calculator</h1>
+  <form id="fsg-form" autocomplete="off">
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="T" class="form-label">Temperature</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="T" name="T" required>
+          <select class="form-select" id="T_unit">
+            <option value="K">K</option>
+            <option value="C">°C</option>
+            <option value="F">°F</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="P" class="form-label">Pressure</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="P" name="P" required>
+          <select class="form-select" id="P_unit">
+            <option value="atm">atm</option>
+            <option value="bar">bar</option>
+            <option value="Pa">Pa</option>
+            <option value="kPa">kPa</option>
+            <option value="psi">psi</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="M_A" class="form-label">Molar Mass A</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="M_A" name="M_A" required>
+          <select class="form-select" id="M_A_unit">
+            <option value="g/mol">g/mol</option>
+            <option value="kg/mol">kg/mol</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="M_B" class="form-label">Molar Mass B</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="M_B" name="M_B" required>
+          <select class="form-select" id="M_B_unit">
+            <option value="g/mol">g/mol</option>
+            <option value="kg/mol">kg/mol</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="sigma_A" class="form-label">Collision Diameter σ_A</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="sigma_A" name="sigma_A" required>
+          <select class="form-select" id="sigma_A_unit">
+            <option value="A">Å</option>
+            <option value="nm">nm</option>
+            <option value="m">m</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="sigma_B" class="form-label">Collision Diameter σ_B</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="sigma_B" name="sigma_B" required>
+          <select class="form-select" id="sigma_B_unit">
+            <option value="A">Å</option>
+            <option value="nm">nm</option>
+            <option value="m">m</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="epsilon_k_A" class="form-label">Characteristic Energy ε/κ_A</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="epsilon_k_A" name="epsilon_k_A" required>
+          <select class="form-select" id="epsilon_k_A_unit">
+            <option value="K">K</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="epsilon_k_B" class="form-label">Characteristic Energy ε/κ_B</label>
+        <div class="input-group">
+          <input type="number" step="any" min="0" class="form-control" id="epsilon_k_B" name="epsilon_k_B" required>
+          <select class="form-select" id="epsilon_k_B_unit">
+            <option value="K">K</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="output_unit" class="form-label">Output Unit</label>
+      <select id="output_unit" class="form-select w-auto">
+        <option value="cm^2/s">cm²/s</option>
+        <option value="m^2/s">m²/s</option>
+      </select>
+    </div>
+    <button type="button" id="calculate-btn" class="btn btn-primary btn-lg">Calculate D_AB</button>
+    <!-- Warning for out-of-range inputs -->
+    <div id="range-warning" class="alert alert-warning mt-3" style="display:none;"></div>
+  </form>
+  <div id="output-section" class="mt-4">
+    <div class="mb-3">
+      <h5>Result</h5>
+      <p id="result-value" class="fs-5">Enter values and click 'Calculate D_AB' to see results...</p>
+    </div>
+    <div class="mb-3 d-flex align-items-center gap-2">
+      <h5 class="mb-0">Calculation Steps</h5>
+      <button id="copy-latex-btn" class="btn btn-outline-secondary btn-sm ms-2">Copy LaTeX Steps</button>
+    </div>
+    <div id="latex-steps" class="bg-light p-3 rounded mb-3">Step-by-step calculation details will appear here after calculation.</div>
+    <div class="mb-3 d-flex align-items-center gap-2">
+      <h5 class="mb-0">Citation</h5>
+      <button id="copy-citation-btn" class="btn btn-outline-secondary btn-sm ms-2">Copy Citation</button>
+    </div>
+    <p id="citation" class="small text-muted">Fuller, E.N., Schettler, P.D., & Giddings, J.C. (1966). A New Method for Prediction of Binary Gas-Phase Diffusion Coefficients. J. Phys. Chem., 70(11), 3676–3680.</p>
+    <div class="mb-3 d-flex align-items-center gap-2">
+      <h6 class="mb-0">Cite This Tool</h6>
+      <button id="copy-tool-citation-btn" class="btn btn-outline-secondary btn-sm ms-2">Copy Tool Citation</button>
+    </div>
+    <p id="tool-citation" class="small text-muted">ChemE Calc. (2025). Fuller-Schettler-Giddings Diffusion Coefficient Calculator [Web Application].</p>
+    <div class="mb-3">
+      <h5>Applicability</h5>
+      <p id="applicability-notes" class="small text-muted">Valid for dilute gas mixtures (~300–2000 K, <10 bar). For D_AB in cm²/s, use T in K, P in atm, M in g/mol, σ in Å.</p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="{{ url_for('static', filename='js/fsg_calculator.js') }}"></script>
+</div>
+{% endblock %}

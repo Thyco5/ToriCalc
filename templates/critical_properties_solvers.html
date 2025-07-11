@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Critical Properties Solvers | ToriCalc{% endblock %}
+
+{% block head_extra %}
+    {# Link to a new CSS file if specific styles are needed, or reuse solver_suite_page.css if card styles are identical #}
+    {# For now, assuming solver_suite_page.css card styles can be largely reused or extended #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solver_suite_page.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/category_page.css') }}"> 
+{% endblock %}
+
+{% block content %}
+<div class="category-page-wrapper container py-5">
+    <header class="text-center mb-4 category-page-header">
+        <h1 class="display-5 fw-bold">Critical Properties Solvers</h1>
+        <p class="lead text-muted">
+            Select a method below to estimate key critical properties like T<sub>c</sub>, P<sub>c</sub>, and V<sub>c</sub> for various chemical compounds.
+        </p>
+    </header>
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb justify-content-center">
+            <li class="breadcrumb-item"><a href="{{ url_for('calculators_landing_page') }}">ToriCalc Solver Suite</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Critical Properties</li>
+        </ol>
+    </nav>
+
+    <div class="row gy-4 justify-content-center">
+        <!-- Joback Method Card -->
+        <div class="col-md-6 col-lg-6 d-flex align-items-stretch">
+            <div class="card solver-category-card h-100 shadow-sm w-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="card-icon mx-auto"><i class="fas fa-cubes"></i></div> 
+                    <h5 class="card-title mt-3">Joback Method</h5>
+                    <p class="card-text flex-grow-1">A widely-used group contribution method for estimating critical temperature (T<sub>c</sub>), pressure (P<sub>c</sub>), volume (V<sub>c</sub>), and normal boiling point (T<sub>b</sub>).</p>
+                    <a href="{{ url_for('critical_props.calculator_joback_page') }}" class="btn btn-primary mt-auto"><i class="fas fa-calculator me-2"></i>Open Joback Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Constantinou-Gani Method Card -->
+        <div class="col-md-6 col-lg-6 d-flex align-items-stretch">
+            <div class="card solver-category-card h-100 shadow-sm w-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="card-icon mx-auto"><i class="fas fa-atom"></i></div> 
+                    <h5 class="card-title mt-3">Constantinou-Gani Method</h5>
+                    <p class="card-text flex-grow-1">An advanced group contribution method utilizing first and second-order groups for predicting critical properties (T<sub>c</sub>, P<sub>c</sub>, V<sub>c</sub>) with improved accuracy for complex molecules.</p>
+                    <a href="{{ url_for('critical_props.calculator_cg_page_render') }}" class="btn btn-primary mt-auto"><i class="fas fa-calculator me-2"></i>Open Constantinou-Gani Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wilson & Jasperson Method Card (Coming Soon) -->
+        <div class="col-md-6 col-lg-6 d-flex align-items-stretch">
+            <div class="card solver-category-card h-100 shadow-sm w-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="card-icon mx-auto"><i class="fas fa-tools"></i></div> 
+                    <h5 class="card-title mt-3">Wilson & Jasperson Method</h5>
+                    <p class="card-text flex-grow-1">Estimate critical properties using the Wilson & Jasperson correlation, offering an alternative approach particularly useful for certain classes of organic compounds. <span class="fw-semibold">Coming soon!</span></p>
+                    <button class="btn btn-secondary disabled mt-auto" disabled><i class="fas fa-hourglass-half me-2"></i>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marrero & Pardillo Method Card (Coming Soon) -->
+        <div class="col-md-6 col-lg-6 d-flex align-items-stretch">
+            <div class="card solver-category-card h-100 shadow-sm w-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="card-icon mx-auto"><i class="fas fa-cogs"></i></div> 
+                    <h5 class="card-title mt-3">Marrero & Pardillo Method</h5>
+                    <p class="card-text flex-grow-1">A comprehensive group contribution method for the estimation of critical properties and other important thermophysical data for a wide range of organic substances. <span class="fw-semibold">Coming soon!</span></p>
+                    <button class="btn btn-secondary disabled mt-auto" disabled><i class="fas fa-hourglass-half me-2"></i>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,170 @@
+/* static/css/cheme_tools_page.css */
+
+/* Page Header Section - Reverted to simpler, Homepage-like style */
+.cheme-tools-page-wrapper .cheme-tools-page-header {
+    padding-top: 2rem; /* Or match homepage hero padding */
+    padding-bottom: 1.5rem; /* Or match homepage hero padding */
+    margin-bottom: 3rem !important; /* Spacing below header */
+    /* background: none; */ /* Ensure no conflicting background from previous blue banner style */
+}
+
+.cheme-tools-page-wrapper .cheme-tools-page-header .display-4 {
+    color: #212529; /* Dark text color, like homepage H1 */
+    font-weight: 700; /* Or match homepage H1 weight */
+    font-size: 2.8rem; /* Or match homepage H1 size */
+    margin-bottom: 0.5rem; /* Spacing between H1 and subtitle */
+}
+
+.cheme-tools-page-wrapper .cheme-tools-page-header .lead-subtitle {
+    font-size: 1.25rem; /* Or match homepage subtitle size */
+    color: #6c757d; /* Muted text color, like homepage subtitle */
+    font-weight: 400; /* Or match homepage subtitle weight */
+    margin-bottom: 0; /* No extra margin below subtitle if header has enough padding-bottom */
+}
+
+/* Vision Statement Section */
+.vision-statement-section {
+    border: none; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    margin-bottom: 3rem !important; 
+    /* background-color: #f8f9fa; */ /* Retain bg-light from class if desired or set here */
+}
+
+.vision-statement-section .section-headline {
+    color: #0a58ca;
+    font-size: 1.75rem; 
+}
+
+/* Planned Tools Section Wrapper */
+.planned-tools-section-wrapper {
+    background-color: #f8f9fa; 
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    border-radius: 0.75rem;
+}
+
+.planned-tools-section .section-headline {
+    color: #343a40;
+    font-size: 1.75rem; 
+    margin-bottom: 2.5rem !important;
+}
+
+/* Tool Card Styling - Add back animation properties */
+.tool-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-top: 3px solid #0d6efd; 
+    border-radius: 0.5rem; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, box-shadow 0.25s ease-out;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(20px); /* Initial state for animation - slight slide up */
+}
+
+.tool-card.is-visible { 
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tool-card:hover {
+    transform: translateY(-8px); /* Slightly more pronounced lift */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.tool-card .card-icon {
+    width: 60px;
+    height: 60px;
+    background-image: linear-gradient(135deg, #117eff, #0b5ed7); 
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem; 
+    transition: transform 0.25s ease-out; /* Smooth transition for icon */
+}
+
+.tool-card .card-icon i {
+    color: #fff; 
+    font-size: 1.8rem; 
+}
+
+.tool-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg); /* Icon animation on hover */
+}
+
+.tool-card .card-title {
+    font-weight: 700; 
+    color: #343a40;
+    font-size: 1.2rem; 
+}
+
+.tool-card .card-text {
+    line-height: 1.6;
+    font-size: 0.875rem; 
+}
+
+.tool-status-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: #0d6efd; 
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.3rem 0.6rem;
+    border-radius: 50px; 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tool-card.suggestion-card .btn-primary {
+    padding: 0.6rem 1.2rem; 
+    font-weight: 600;
+    /* Bootstrap .btn-primary already has good hover/active states */
+}
+
+/* General animation states for other sections */
+.cheme-tools-page-header.anim-target-js, 
+.vision-statement-section.anim-target-js,
+.planned-tools-section > .text-center.anim-target-js /* Section title */
+{
+    opacity: 0;
+    transform: translateY(20px); /* Slight slide-up effect */
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+/* Delay for the intro section if header animates first */
+.vision-statement-section.anim-target-js {
+    transition-delay: 0.15s;
+}
+
+/* Delay for the card section title if intro animates first */
+.planned-tools-section > .text-center.anim-target-js {
+    transition-delay: 0.3s;
+}
+
+
+.cheme-tools-page-header.anim-target-js.is-visible, 
+.vision-statement-section.anim-target-js.is-visible,
+.planned-tools-section > .text-center.anim-target-js.is-visible
+{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .cheme-tools-page-wrapper .cheme-tools-page-header .display-4 {
+        font-size: 2.2rem; /* Adjusted for smaller screens */
+    }
+    .cheme-tools-page-wrapper .cheme-tools-page-header .lead-subtitle {
+        font-size: 1.1rem; /* Adjusted for smaller screens */
+    }
+    .vision-statement-section .lead {
+        font-size: 1rem;
+    }
+    .tool-card .card-title {
+        font-size: 1.1rem;
+    }
+} 

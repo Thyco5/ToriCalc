@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}Constantinou-Gani Calculator | ToriCalc{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/constantinou_gani_calculator.css') }}">
+    {# MathJax basic config assumed to be in base.html or loaded before main calculator JS #}
+    <style>
+        /* Minimal specific styles for Ketcher if not fully covered by shared CSS */
+        #ketcherFrameCG {
+            width: 100%;
+            height: 55vh; /* Consistent with shared CSS */
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+        /* Ensure .modal-dialog-ketcher class is used on the modal for shared styling */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page-wrapper container py-5">
+    <header class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Constantinou-Gani Method for Critical Properties</h1>
+        <p class="lead text-muted">Estimate T<sub>c</sub>, P<sub>c</sub>, V<sub>c</sub>, &omega; and T<sub>b</sub> using the Constantinou & Gani group contribution method.</p>
+    </header>
+
+    <form id="cg_form" autocomplete="off">
+        <div class="row gy-4">
+            <!-- Input Column -->
+            <div class="col-lg-7">
+                <div class="row gy-4">
+
+                    <!-- Molecule Identification Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm molecule-id-card">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-atom me-2 text-primary"></i>Molecule Identification</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="smiles_input_cg" class="form-label">SMILES String</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="smiles_input_cg" placeholder="e.g., CCO (Ethanol)" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="drawMoleculeBtnCG" data-bs-toggle="modal" data-bs-target="#ketcherModalCG" title="Draw Molecule">
+                                            <i class="fas fa-pencil-ruler me-1"></i> Draw
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="chemicalNameInputCG" class="form-label">Chemical Name</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="chemicalNameInputCG" placeholder="e.g., Ethanol, Benzene">
+                                        <button class="btn btn-outline-primary" type="button" id="getNameSmilesBtnCG"><i class="fas fa-search me-1"></i> Get SMILES</button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="popularMoleculeSelectCG" class="form-label">Popular Molecule</label>
+                                    <select class="form-select" id="popularMoleculeSelectCG">
+                                        <option value="" selected>-- Select from list --</option>
+                                        {# Options populated by JS #}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="formulaInputCG" class="form-label">Chemical Formula</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="formulaInputCG" placeholder="e.g., C2H5OH (for lookup)">
+                                        <button class="btn btn-outline-secondary" type="button" id="loadFormulaBtnCG"><i class="fas fa-atom me-1"></i> Load Formula</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculation Parameters Card -->
+                    <div class="col-md-12">
+                        <div class="card input-card shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0 card-title-custom"><i class="fas fa-sliders-h me-2 text-primary"></i>Calculation Parameters</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <label for="calculationOrderCG" class="form-label">Calculation Order</label>
+                                <select class="form-select" id="calculationOrderCG">
+                                    <option value="1" selected>First Order</option>
+                                    <option value="2">Second Order (if applicable)</option> 
+                                    {# Add more if JS supports it, e.g. third order #}
+                                </select>
+                                <small class="form-text text-muted">Select the order of group contributions. Higher orders may provide more accuracy if groups are available.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="col-md-12 d-flex justify-content-start gap-2 mt-4 action-buttons">
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-cogs me-2"></i>Calculate Critical Properties (CG)</button>
+                        <button type="reset" class="btn btn-outline-secondary btn-lg"><i class="fas fa-undo me-2"></i>Reset Fields</button>
+                    </div>
+                    
+                    <!-- Error Display Area -->
+                    <div class="col-md-12 mt-3">
+                        <div id="cg-warning-display" class="alert alert-danger warning-display-area" style="display:none;"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Output Column -->
+            <div class="col-lg-5">
+                <div class="sticky-lg-top" style="top: 100px;">
+                    <!-- Results Card -->
+                    <div id="resultsCardCG" class="card output-card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0 card-title-custom"><i class="fas fa-check-circle me-2"></i>Results</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div id="cg_results_placeholder" class="result-placeholder fs-5 text-muted text-center">
+                                Enter SMILES, select parameters, then click 'Calculate' to see results.
+                            </div>
+                            <div id="cg_results_content" style="display:none;">
+                                <div class="row g-3">
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_tc_cg" class="form-label">Critical Temperature (T<sub>c</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_tc_cg" class="form-control result-value">---</span>
+                                            <select id="outputUnit_tc_cg" class="form-select output-unit-select">
+                                                <option value="K" selected>K</option><option value="C">°C</option><option value="F">°F</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_pc_cg" class="form-label">Critical Pressure (P<sub>c</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_pc_cg" class="form-control result-value">---</span>
+                                            <select id="outputUnit_pc_cg" class="form-select output-unit-select">
+                                                <option value="bar" selected>bar</option><option value="atm">atm</option><option value="Pa">Pa</option><option value="kPa">kPa</option><option value="psi">psi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_vc_cg" class="form-label">Critical Volume (V<sub>c</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_vc_cg" class="form-control result-value">---</span>
+                                            <select id="outputUnit_vc_cg" class="form-select output-unit-select">
+                                                <option value="cm3/mol" selected>cm³/mol</option><option value="m3/mol">m³/mol</option><option value="L/mol">L/mol</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 result-item">
+                                        <label for="omega_cg" class="form-label">Acentric Factor (&omega;)</label> <!-- No unit select needed -->
+                                        <div class="input-group">
+                                            <span id="result_omega_cg" class="form-control result-value" style="border-right: 1px solid #ced4da; border-radius: 0.25rem;">---</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 result-item">
+                                        <label for="outputUnit_tb_calc_cg" class="form-label">Calculated Boiling Point (T<sub>b,calc</sub>)</label>
+                                        <div class="input-group">
+                                            <span id="result_tb_calc_cg" class="form-control result-value">---</span>
+                                            <select id="outputUnit_tb_calc_cg" class="form-select output-unit-select">
+                                                <option value="K" selected>K</option><option value="C">°C</option><option value="F">°F</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="my-3">
+                                <div class="calculation-steps-area">
+                                    <button class="btn btn-secondary w-100 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#cgLatexStepsContent" aria-expanded="false" aria-controls="cgLatexStepsContent">
+                                        <i class="fas fa-stream me-2"></i>Show/Hide Calculation Steps
+                                    </button>
+                                    <div class="collapse" id="cgLatexStepsContent">
+                                        <div id="cg_latex_steps" class="mathjax-container p-3 border rounded" style="min-height: 100px;">
+                                            Step-by-step calculation details will appear here.
+                                        </div>
+                                        <button type="button" id="copy_latex_btn_cg" class="btn btn-outline-primary btn-sm mt-2 w-100"><i class="fas fa-copy me-2"></i>Copy LaTeX Steps</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supporting Information Accordion (id="infoCardCG" for JS to control if needed) -->
+                    <div id="infoCardCG" class="accordion shadow-sm">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="cgHeadingCitation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cgCollapseCitation" aria-expanded="false" aria-controls="cgCollapseCitation">
+                                    <i class="fas fa-book-reader me-2 text-primary"></i>Citation (Original Paper)
+                                </button>
+                            </h2>
+                            <div id="cgCollapseCitation" class="accordion-collapse collapse" aria-labelledby="cgHeadingCitation" data-bs-parent="#infoCardCG">
+                                <div class="accordion-body">
+                                    <div class="mb-2">
+                                        <label for="paperCitationSelectCG" class="form-label form-label-sm">Select Paper:</label>
+                                        <select id="paperCitationSelectCG" class="form-select form-select-sm d-block w-100 mb-2">
+                                            <!-- Options populated by JS -->
+                                        </select>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select id="paper_citation_format_cg" class="form-select form-select-sm w-auto">
+                                            <option value="Default" selected>Default</option><option value="APA">APA</option><option value="ACS">ACS</option><option value="BibTeX">BibTeX</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy_citation_btn_cg"><i class="fas fa-copy me-2"></i>Copy</button>
+                                    </div>
+                                    <p id="cg_citation_display" class="small text-muted" style="min-height: 3em; padding-top: 0.5em;">Paper citation will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="cgHeadingToolCitation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cgCollapseToolCitation" aria-expanded="false" aria-controls="cgCollapseToolCitation">
+                                    <i class="fas fa-laptop-code me-2 text-primary"></i>Cite This Tool
+                                </button>
+                            </h2>
+                            <div id="cgCollapseToolCitation" class="accordion-collapse collapse" aria-labelledby="cgHeadingToolCitation" data-bs-parent="#infoCardCG">
+                                <div class="accordion-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <select id="tool_citation_format_cg" class="form-select form-select-sm w-auto">
+                                            <option value="Default" selected>Default</option><option value="APA">APA</option><option value="ACS">ACS</option><option value="BibTeX">BibTeX</option>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copy_tool_citation_btn_cg"><i class="fas fa-copy me-2"></i>Copy</button>
+                                    </div>
+                                    <p id="cg_tool_citation_display" class="small text-muted" style="min-height: 2.5em; padding-top: 0.5em;">Tool citation will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="cgHeadingApplicability">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cgCollapseApplicability" aria-expanded="false" aria-controls="cgCollapseApplicability">
+                                    <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Applicability Notes
+                                </button>
+                            </h2>
+                            <div id="cgCollapseApplicability" class="accordion-collapse collapse" aria-labelledby="cgHeadingApplicability" data-bs-parent="#infoCardCG">
+                                <div class="accordion-body">
+                                    <p id="cg_applicability_notes" class="small text-muted">Applicability notes will appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div> <!-- End Main Container -->
+
+<!-- Ketcher Modal -->
+<div class="modal fade" id="ketcherModalCG" tabindex="-1" aria-labelledby="ketcherModalCGLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-ketcher"> {# Use .modal-dialog-ketcher for shared styling #}
+        <div class="modal-content ketcher-modal-dialog"> {# Use .ketcher-modal-dialog for shared styling #}
+            <div class="modal-header">
+                <h5 class="modal-title" id="ketcherModalCGLabel"><i class="fas fa-drafting-compass me-2"></i>Draw Chemical Structure</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-2">
+                <iframe id="ketcherFrameCG" src="{{ url_for('static', filename='ketcher-standalone-3.2.0/standalone/index.html') }}"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="useStructureBtnCG"><i class="fas fa-check me-1"></i>Use This Structure</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax-script" async></script>
+    <script src="{{ url_for('static', filename='js/constantinou_gani_calculator.js') }}"></script>
+{% endblock %}

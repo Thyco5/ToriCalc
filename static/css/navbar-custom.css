@@ -1,0 +1,118 @@
+/* static/css/navbar-custom.css */
+
+/* General Navbar Adjustments */
+.toricalc-navbar .navbar-brand span {
+    font-weight: bold;
+    font-size: 1.5rem; /* ToriCalc brand size */
+}
+
+.toricalc-navbar .nav-link {
+    transition: color 0.3s ease, background-color 0.3s ease;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.toricalc-navbar .nav-link:hover,
+.toricalc-navbar .nav-link.active-main-link {
+    color: #0056b3; /* Example primary color for hover/active */
+}
+
+/* Styling for the Calculators Dropdown */
+.calculators-dropdown .dropdown-menu {
+    /* min-width: 250px; */ /* Adjust as needed */
+}
+
+/* Styling for all submenu trigger items in the Calculators dropdown */
+.calculators-dropdown .calculator-submenu-item > .dropdown-toggle,
+.calculators-dropdown .vertical-expand-item > .vertical-expand-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Chevron for vertical expansion triggers */
+.calculators-dropdown .vertical-expand-trigger i.fa-chevron-right {
+    transition: transform 0.3s ease;
+}
+
+.calculators-dropdown .vertical-expand-item.open > .vertical-expand-trigger i.fa-chevron-right {
+    transform: rotate(90deg);
+}
+
+/* Vertically Expanding Submenu */
+.dropdown-menu-vertical-expansion {
+    list-style: none;
+    padding-left: 0; /* Remove default ul padding */
+    margin-left: 1.5rem; /* Indent under parent */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out, opacity 0.35s ease-out, margin-top 0.35s ease-out, padding-top 0.35s ease-out, padding-bottom 0.35s ease-out;
+    opacity: 0;
+    /* border-left: 2px solid #0056b3; */ /* Optional visual indicator, can be re-added if desired */
+    background-color: #fdfdfd; /* Slightly off-white for the sub-panel */
+    border-radius: 0 0 4px 4px; /* Optional: if you want rounded corners at bottom */
+}
+
+.calculators-dropdown .vertical-expand-item.open > .dropdown-menu-vertical-expansion {
+    max-height: 500px; /* Adjust to fit content */
+    opacity: 1;
+    margin-top: 0.25rem; /* Small space above */
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.dropdown-menu-vertical-expansion .dropdown-item {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    font-size: 0.9em;
+}
+
+.dropdown-menu-vertical-expansion .dropdown-item:hover {
+    background-color: #e9ecef;
+}
+
+.dropdown-menu-vertical-expansion .dropdown-item.active { /* For active page link within expansion */
+    font-weight: bold;
+    color: #0056b3;
+}
+
+
+/* Exclusive visibility: highlight for the currently active/hovered main section in dropdown */
+.calculators-dropdown .vertical-expand-item > .vertical-expand-trigger.active-section {
+    background-color: #e9ecef;
+}
+
+/* Remove styles for .bs-submenu-flipped-left as it's no longer used for these items */
+/* Styles for .calculators-dropdown .dropend .dropdown-menu can also be removed if no other flyouts exist */
+
+/* --- START: Hover for Desktop Dropdown --- */
+@media (min-width: 992px) { /* lg breakpoint and up */
+    .toricalc-navbar .calculators-dropdown:hover > .dropdown-menu {
+        display: block;
+        margin-top: 0; /* Adjust if there's any unwanted gap */
+    }
+
+    /* Keep dropdown open when hovering over items in it */
+    .toricalc-navbar .calculators-dropdown .dropdown-menu:hover {
+        display: block;
+    }
+    
+    /* Optional: Slight delay to prevent accidental closing if mouse briefly leaves */
+    /* .toricalc-navbar .calculators-dropdown .dropdown-menu {
+        transition-delay: 0.1s; 
+    } */
+    /* .toricalc-navbar .calculators-dropdown:not(:hover) .dropdown-menu {
+        transition-delay: 0.2s; 
+    } */
+}
+/* --- END: Hover for Desktop Dropdown --- */
+
+/* Accessibility Icon related styles were here - REMOVED if icon is removed */
+/* If .accessibility-icon class was used elsewhere and needs to be kept for other reasons, review this. */
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) { /* lg breakpoint */
+    .toricalc-navbar .navbar-collapse {
+        /* Optional: if you want a slightly different background for the expanded mobile menu */
+    }
+} 

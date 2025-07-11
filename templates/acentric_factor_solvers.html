@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+
+{% block title %}Acentric Factor Calculator{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <style>
+    .property-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .property-input-row label {
+      font-weight: bold;
+      min-width: 40px;
+    }
+    .property-input-row select {
+      flex-grow: 1;
+    }
+    .property-input-row .form-control {
+      min-width: 120px;
+    }
+    .input-group-text {
+      min-width: 50px;
+      justify-content: center;
+    }
+    .results-section h4 {
+      margin-top: 2rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 5px;
+    }
+    .loader-small {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+    .citation-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .citation-bibtex {
+        white-space: pre-wrap;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12 text-center mb-4">
+      <h1>Acentric Factor (ω) Solvers</h1>
+      <p class="lead">A smart solver that finds required properties for the Lee-Kesler method.</p>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white">
+      <h3>Smart Solver: Lee-Kesler Method</h3>
+    </div>
+    <div class="card-body">
+    <ul class="nav nav-tabs" id="solverModeTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="find-chemical-tab" data-bs-toggle="tab" data-bs-target="#find-chemical-pane" type="button" role="tab" aria-controls="find-chemical-pane" aria-selected="true">Find Chemical (Smart Solver)</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manual-input-tab" data-bs-toggle="tab" data-bs-target="#manual-input-pane" type="button" role="tab" aria-controls="manual-input-pane" aria-selected="false">Manual Input</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="solverModeTabContent">
+        <div class="tab-pane fade show active" id="find-chemical-pane" role="tabpanel" aria-labelledby="find-chemical-tab">
+            <div class="p-3">
+                <div class="mb-3">
+                    <label for="chemical-name-input" class="form-label"><b>Step 1: Find Your Chemical</b></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="chemical-name-input" placeholder="e.g., benzene, ethanol...">
+                        <button class="btn btn-primary" type="button" id="find-chemical-btn">Find</button>
+                    </div>
+                    <div id="finder-status" class="form-text mt-2"></div>
+                </div>
+
+                <div id="property-inputs-container" style="display:none;">
+                    </div>
+                
+                <div id="final-calc-container" style="display:none;">
+                    <hr>
+                    <p class="form-label"><b>Step 2: Calculate Acentric Factor</b></p>
+                    <button class="btn btn-success w-100" id="calculate-omega-btn-smart">Calculate ω</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="manual-input-pane" role="tabpanel" aria-labelledby="manual-input-tab">
+            <div class="p-3">
+                <p>Enter your known experimental or estimated data below in standard units.</p>
+                <div class="property-input-row">
+                    <label for="manual-tb-value">T<sub>b</sub>:</label>
+                    <input type="number" step="any" class="form-control" id="manual-tb-value" placeholder="e.g., 353.24">
+                    <span class="input-group-text">K</span>
+                </div>
+                <div class="property-input-row">
+                    <label for="manual-tc-value">T<sub>c</sub>:</label>
+                    <input type="number" step="any" class="form-control" id="manual-tc-value" placeholder="e.g., 562.05">
+                    <span class="input-group-text">K</span>
+                </div>
+                <div class="property-input-row">
+                    <label for="manual-pc-value">P<sub>c</sub>:</label>
+                    <input type="number" step="any" class="form-control" id="manual-pc-value" placeholder="e.g., 48.95">
+                    <span class="input-group-text">bar</span>
+                </div>
+                <hr>
+                <button class="btn btn-success w-100" id="calculate-omega-btn-manual">Calculate ω</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="results-container" class="p-3" style="display:none;">
+        <h4>Result</h4>
+        <div class="alert alert-success">
+          <strong>Acentric Factor (ω):</strong> <span id="omega-result" class="fw-bold"></span>
+        </div>
+        
+        <h4>Calculation Steps</h4>
+        <div id="calculation-steps-container" class="p-3 border rounded bg-light"></div>
+        <button id="copy-latex-button" class="btn btn-secondary btn-sm mt-2" style="display:none;">Copy LaTeX</button>
+
+        <h4>Citations</h4>
+        <div id="tool-citation-container"></div>
+        <div class="citation-controls mt-2">
+            <span>Format:</span>
+            <div class="btn-group btn-group-sm" role="group">
+                <button class="btn btn-outline-secondary format-btn active" data-format="default">Default</button>
+                <button class="btn btn-outline-secondary format-btn" data-format="apa">APA</button>
+                <button class="btn btn-outline-secondary format-btn" data-format="acs">ACS</button>
+                <button class="btn btn-outline-secondary format-btn" data-format="bibtex">BibTeX</button>
+            </div>
+        </div>
+        <div id="source-citations-container" class="mt-2"></div>
+      </div>
+  </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- STATE MANAGEMENT ---
+    const appState = {
+        cas: null,
+        properties: { // Stores the base values in standard units (K and Pa)
+            tb: { value: null, method: null },
+            tc: { value: null, method: null },
+            pc: { value: null, method: null }
+        },
+        citations: new Map()
+    };
+
+    // --- DOM ELEMENT SELECTORS ---
+    // General
+    const resultsContainer = document.getElementById('results-container');
+    const omegaResult = document.getElementById('omega-result');
+    const stepsContainer = document.getElementById('calculation-steps-container');
+    const copyLatexButton = document.getElementById('copy-latex-button');
+    const toolCitationContainer = document.getElementById('tool-citation-container');
+    const sourceCitationsContainer = document.getElementById('source-citations-container');
+    const citationFormatButtons = document.querySelectorAll('.citation-controls .format-btn');
+    let rawLatexString = '';
+    
+    // Smart Solver
+    const findButton = document.getElementById('find-chemical-btn');
+    const nameInput = document.getElementById('chemical-name-input');
+    const finderStatus = document.getElementById('finder-status');
+    const propertyInputsContainer = document.getElementById('property-inputs-container');
+    const finalCalcContainer = document.getElementById('final-calc-container');
+    const calculateSmartButton = document.getElementById('calculate-omega-btn-smart');
+
+    // Manual Solver
+    const calculateManualButton = document.getElementById('calculate-omega-btn-manual');
+
+    // --- UNIFIED CALCULATION & DISPLAY LOGIC ---
+    async function handleFinalCalculation(tb, tc, pc_bar) {
+        // Clear previous results and show loader
+        resultsContainer.style.display = 'block';
+        omegaResult.textContent = '...';
+        stepsContainer.innerHTML = '<div class="loader-small"></div>';
+        copyLatexButton.style.display = 'none';
+        
+        // On manual calculation, clear old smart-solver citations
+        const isManual = !appState.cas;
+        if(isManual) {
+            appState.citations.clear();
+        }
+
+        const payload = { Tb: tb, Tc: tc, Pc_bar: pc_bar };
+
+        try {
+            const response = await fetch('/api/calculate_lk_omega', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            
+            omegaResult.textContent = data.omega;
+            stepsContainer.innerHTML = data.plain_steps;
+            rawLatexString = data.latex_steps;
+            copyLatexButton.style.display = 'block';
+            
+            data.citations.forEach(c => appState.citations.set(c.id, c));
+            displayCitations(document.querySelector('.format-btn.active').dataset.format);
+
+            if (window.MathJax) {
+                setTimeout(() => {
+                    stepsContainer.innerHTML = data.latex_steps;
+                    MathJax.typesetPromise([stepsContainer]).catch(console.error);
+                }, 10);
+            }
+
+        } catch(error) {
+            stepsContainer.innerHTML = `<p class="text-danger">Calculation Failed: ${error.message}</p>`;
+        }
+    }
+
+    // --- SMART SOLVER LOGIC ---
+
+    function convertForDisplay(value, baseUnit, targetUnit) {
+        if (isNaN(value) || value === null) return '';
+        if (baseUnit === 'K') {
+            if (targetUnit === 'C') return value - 273.15;
+            if (targetUnit === 'F') return (value - 273.15) * 9/5 + 32;
+        }
+        if (baseUnit === 'Pa') {
+            if (targetUnit === 'bar') return value / 1e5;
+            if (targetUnit === 'atm') return value / 101325;
+        }
+        return value;
+    }
+    
+    function updateDisplayValue(propKey) {
+        const valueInput = document.getElementById(`${propKey}-value`);
+        const unitSelect = document.getElementById(`${propKey}-unit-select`);
+        if (!valueInput || !unitSelect) return;
+        
+        const baseValue = appState.properties[propKey].value;
+        const baseUnit = (propKey === 'pc') ? 'Pa' : 'K';
+        
+        const displayVal = convertForDisplay(baseValue, baseUnit, unitSelect.value);
+        valueInput.value = displayVal ? parseFloat(displayVal.toPrecision(6)) : '';
+    }
+
+    async function handleFindChemical() {
+        const chemicalName = nameInput.value.trim();
+        if (!chemicalName) {
+            finderStatus.textContent = 'Please enter a chemical name.';
+            finderStatus.className = 'form-text text-danger';
+            return;
+        }
+        
+        finderStatus.innerHTML = '<div class="loader-small"></div> Finding chemical...';
+        finderStatus.className = 'form-text text-muted';
+        propertyInputsContainer.style.display = 'none';
+        finalCalcContainer.style.display = 'none';
+        resultsContainer.style.display = 'none';
+        appState.cas = null;
+        appState.citations.clear();
+
+        try {
+            const response = await fetch('/api/find_chemical_methods', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: chemicalName })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Chemical not found.');
+
+            appState.cas = data.cas;
+            finderStatus.textContent = `Found: ${data.chemical_name} (CAS: ${data.cas})`;
+            finderStatus.className = 'form-text text-success';
+            buildPropertyInputs(data.available_methods);
+
+        } catch (error) {
+            finderStatus.textContent = `Error: ${error.message}`;
+            finderStatus.className = 'form-text text-danger';
+        }
+    }
+
+    function buildPropertyInputs(methods) {
+        propertyInputsContainer.innerHTML = `<hr><p class="form-label"><b>Step 2: Select Data Sources (or edit values manually)</b></p>`;
+        const props = {
+            tb: { name: 'T<sub>b</sub>', units: ['K', 'C', 'F'], defaultUnit: 'K' },
+            tc: { name: 'T<sub>c</sub>', units: ['K', 'C', 'F'], defaultUnit: 'K' },
+            pc: { name: 'P<sub>c</sub>', units: ['bar', 'Pa', 'atm'], defaultUnit: 'bar' }
+        };
+        let fetchPromises = [];
+
+        for (const [key, propInfo] of Object.entries(props)) {
+            const propMethods = methods[key] || [];
+            let methodOptions = propMethods.map(m => `<option value="${m}">${m}</option>`).join('');
+            let unitOptions = propInfo.units.map(u => `<option value="${u}" ${u === propInfo.defaultUnit ? 'selected' : ''}>${u}</option>`).join('');
+
+            const inputHtml = `
+                <div class="property-input-row">
+                    <label>${propInfo.name}:</label>
+                    <select class="form-select" id="${key}-method-select" data-prop-key="${key}">
+                        <option value="">-- Method --</option>
+                        ${methodOptions}
+                    </select>
+                    <input type="number" step="any" class="form-control" id="${key}-value" placeholder="Enter value..." data-prop-key="${key}">
+                    <select class="form-select" id="${key}-unit-select" data-prop-key="${key}">
+                        ${unitOptions}
+                    </select>
+                </div>
+            `;
+            propertyInputsContainer.innerHTML += inputHtml;
+            if (propMethods.length > 0) {
+                 fetchPromises.push(getPropertyValue(key, propMethods[0], true));
+            }
+        }
+        
+        Promise.all(fetchPromises).finally(() => {
+            propertyInputsContainer.style.display = 'block';
+            finalCalcContainer.style.display = 'block';
+        });
+    }
+
+    async function getPropertyValue(propKey, method, isInitialLoad = false) {
+        const valueInput = document.getElementById(`${propKey}-value`);
+        if(valueInput) valueInput.value = 'Fetching...';
+
+        try {
+            const response = await fetch('/api/get_property_value', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cas: appState.cas, property: propKey, method: method })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+
+            appState.properties[propKey] = { value: data.value, method: method };
+            if (data.citation) appState.citations.set(data.citation.id, data.citation);
+            
+            updateDisplayValue(propKey);
+            if (!isInitialLoad) {
+                displayCitations(document.querySelector('.format-btn.active').dataset.format);
+            }
+            // Set the method dropdown to the fetched method
+            const methodSelect = document.getElementById(`${propKey}-method-select`);
+            if (methodSelect) methodSelect.value = method;
+
+        } catch (error) {
+            if(valueInput) valueInput.value = 'Error';
+            console.error(`Failed to fetch ${propKey} with ${method}:`, error);
+        }
+    }
+    
+    // --- MANUAL INPUT LOGIC ---
+
+    calculateManualButton.addEventListener('click', () => {
+        appState.cas = null; // Mark as manual calculation
+        const tb_K = parseFloat(document.getElementById('manual-tb-value').value);
+        const tc_K = parseFloat(document.getElementById('manual-tc-value').value);
+        const pc_bar = parseFloat(document.getElementById('manual-pc-value').value);
+
+        if (isNaN(tb_K) || isNaN(tc_K) || isNaN(pc_bar)) {
+            resultsContainer.style.display = 'block';
+            stepsContainer.innerHTML = `<p class="text-danger">Calculation Failed: Please enter valid numbers in all manual input fields.</p>`;
+            return;
+        }
+        handleFinalCalculation(tb_K, tc_K, pc_bar);
+    });
+
+    calculateSmartButton.addEventListener('click', () => {
+        const { tb, tc, pc } = appState.properties;
+        if (tb.value === null || tc.value === null || pc.value === null || isNaN(tb.value) || isNaN(tc.value) || isNaN(pc.value)) {
+            resultsContainer.style.display = 'block';
+            stepsContainer.innerHTML = `<p class="text-danger">Calculation Failed: One or more properties are missing a valid number.</p>`;
+            return;
+        }
+        handleFinalCalculation(tb.value, tc.value, pc.value / 1e5);
+    });
+    
+    // --- EVENT LISTENERS ---
+    findButton.addEventListener('click', handleFindChemical);
+
+    propertyInputsContainer.addEventListener('change', function(event) {
+        const target = event.target;
+        if (!target) return;
+        const propKey = target.dataset.propKey;
+
+        if (target.matches('select[id*="-method-select"]')) {
+            if(target.value) getPropertyValue(propKey, target.value);
+        } else if (target.matches('select[id*="-unit-select"]')) {
+            updateDisplayValue(propKey);
+        }
+    });
+
+    propertyInputsContainer.addEventListener('input', function(event) {
+        const target = event.target;
+        if (target.matches('input[type="number"]')) {
+            const propKey = target.dataset.propKey;
+            const displayValue = parseFloat(target.value);
+            const unit = document.getElementById(`${propKey}-unit-select`).value;
+            
+            let baseValue = displayValue;
+            if (!isNaN(baseValue)) {
+                if (propKey === 'pc') { // base is Pa
+                    if (unit === 'bar') baseValue *= 1e5;
+                    else if (unit === 'atm') baseValue *= 101325;
+                } else { // base is K
+                    if (unit === 'C') baseValue += 273.15;
+                    else if (unit === 'F') baseValue = (displayValue - 32) * 5/9 + 273.15;
+                }
+            }
+            
+            appState.properties[propKey].value = isNaN(baseValue) ? null : baseValue;
+            
+            const methodSelect = document.getElementById(`${propKey}-method-select`);
+            if (methodSelect) methodSelect.value = "";
+        }
+    });
+
+    citationFormatButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            citationFormatButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            displayCitations(button.dataset.format);
+        });
+    });
+
+    copyLatexButton.addEventListener('click', () => {
+        if(rawLatexString) navigator.clipboard.writeText(rawLatexString);
+    });
+
+    // --- CITATION AND UTILITY FUNCTIONS ---
+    const formatters = {
+        default: (cit) => {
+            const d = cit.data;
+            let formatted = `<strong>[${cit.source_type}]</strong><br>`;
+            const authorStr = Array.isArray(d.authors) ? d.authors.join(', ') : d.author;
+            formatted += `${authorStr} (${d.year}). `;
+            formatted += `<em>${d.title}</em>.`;
+            if (d.journal) formatted += ` ${d.journal}, <strong>${d.volume}</strong>(${d.issue}), pp. ${d.pages}.`;
+            if (d.url) formatted += ` <a href="${d.url}" target="_blank" rel="noopener noreferrer">Source Link</a>`;
+            if (d.retrieved_date) formatted += ` Retrieved ${d.retrieved_date}.`;
+            return `<div class="citation-text mb-2">${formatted}</div>`;
+        },
+        apa: (cit) => {
+            const d = cit.data;
+            let formatted = '';
+            const authorStr = Array.isArray(d.authors) ? d.authors.map(a => a.split(',').reverse().join(' ')).join(', ') : d.author;
+            formatted = `${authorStr} (${d.year}).`;
+            if (d.title) formatted += ` <em>${d.title}</em>.`;
+            if (d.journal) {
+                 formatted += ` ${d.journal}, <em>${d.volume}</em>(${d.issue}), ${d.pages}.`;
+            } else if (d.type === 'Software') {
+                 formatted += ` [${d.type}].`;
+            }
+            if (d.retrieved_date) {
+                formatted += ` Retrieved ${d.retrieved_date}, from ${d.url}`;
+            } else if (d.url) {
+                formatted += ` ${d.url}`;
+            }
+            return `<p class="citation-text">${formatted}</p>`;
+        },
+        acs: (cit) => {
+            const d = cit.data;
+            let formatted = '';
+            if (d.authors) {
+                const authorStr = Array.isArray(d.authors) ? d.authors.join('; ') : d.author;
+                formatted += `${authorStr}. `;
+            } else {
+                formatted += `${d.author}. `;
+            }
+            
+            formatted += `${d.title}. `;
+
+            if (d.journal) {
+                formatted += `<em>${d.journal}</em> <strong>${d.year}</strong>, <em>${d.volume}</em>, ${d.pages}.`;
+            } else if (d.type === 'Software' || d.type === 'Tool') {
+                formatted += `[${d.type}] ${d.url} (accessed ${d.retrieved_date}).`;
+            }
+            return `<p class="citation-text">${formatted}</p>`;
+        },
+        bibtex: (cit) => {
+            const d = cit.data;
+            let bibtex = '';
+            const authorStr = Array.isArray(d.authors) ? d.authors.join(' and ') : `{${d.author}}`;
+
+            if (cit.type === 'Journal Article') {
+                bibtex = `@article{${cit.id},\n  author  = {${authorStr}},\n  title   = {${d.title}},\n  journal = {${d.journal}},\n  year    = {${d.year}},\n  volume  = {${d.volume}},\n  pages   = {${d.pages}}\n}`;
+            } else { // Software or Web App
+                bibtex = `@misc{${cit.id},\n  author       = {${authorStr}},\n  title        = {${d.title}},\n  year         = {${d.year}},\n  url          = {${d.url}}`;
+                if(d.retrieved_date) bibtex += `,\n  note = {Accessed: ${d.retrieved_date}}`
+                bibtex += `\n}`;
+            }
+            return `<pre class="citation-bibtex">${bibtex}</pre>`;
+        }
+    };
+    
+    function displayCitations(format = 'default') {
+        toolCitationContainer.innerHTML = '';
+        sourceCitationsContainer.innerHTML = '';
+        if (appState.citations.size === 0) return;
+
+        let hasSourceCitations = false;
+        appState.citations.forEach(cit => {
+            const formattedHtml = formatters[format](cit);
+            if (cit.source_type === 'Tool') {
+                toolCitationContainer.innerHTML += formattedHtml;
+            } else {
+                sourceCitationsContainer.innerHTML += formattedHtml;
+                hasSourceCitations = true;
+            }
+        });
+
+        // Hide source section if there are no source citations
+        const controls = document.querySelector('.citation-controls');
+        if(controls) controls.style.display = hasSourceCitations ? 'flex' : 'none';
+        if(sourceCitationsContainer) sourceCitationsContainer.style.display = hasSourceCitations ? 'block' : 'none';
+    }
+});
+</script>
+{% endblock %} 

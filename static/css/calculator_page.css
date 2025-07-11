@@ -1,0 +1,218 @@
+/* static/css/calculator_page.css */
+
+/* --- General Calculator Page Styles --- */
+.calculator-page-wrapper {
+    /* font-family: 'Inter', sans-serif; already inherited */
+    color: #343a40; /* Default text color */
+}
+
+.calculator-page-wrapper .display-4 {
+    color: #0d6efd; /* Bootstrap primary blue */
+}
+
+.calculator-page-wrapper .lead {
+    font-size: 1.1rem;
+    color: #6c757d; /* Bootstrap secondary text color */
+}
+
+/* --- Input Cards --- */
+.input-card .card-header, .output-card .card-header {
+    border-bottom: 1px solid #dee2e6; /* Bootstrap card border color */
+}
+
+.input-card .card-title-custom,
+.output-card .card-title-custom {
+    font-weight: 600;
+}
+
+.input-card .form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.input-card .input-group .form-control,
+.input-card .input-group .form-select {
+    border-radius: 0.25rem; /* Consistent border radius */
+}
+
+.input-card .input-unit-select {
+    max-width: 90px; /* Adjust as needed for unit dropdowns */
+    border-left: 0; /* Cleaner look with input group */
+}
+.input-card .input-group-text {
+    border-radius: 0.25rem;
+}
+
+/* Styling for the fixed unit span, e.g., for Kelvin */
+.input-card .input-group-text {
+    background-color: #e9ecef; /* Light grey background */
+    border-left: 0;
+}
+.input-card input[type="number"]:disabled + .input-group-text {
+    background-color: #f8f9fa; /* Lighter if input is disabled */
+}
+
+/* --- Action Buttons --- */
+.calculator-page-wrapper .hero-cta {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+#range-warning-ce {
+    font-size: 0.9rem;
+}
+
+/* --- Output Card --- */
+.output-card .card-body {
+    min-height: 150px; /* Ensure some space even before results */
+}
+
+.result-placeholder {
+    line-height: 1.5;
+}
+
+#result-value-ce {
+    font-size: 2.2rem; /* Prominent result */
+    word-break: break-all; /* Prevent overflow */
+}
+
+#result-unit-ce {
+    font-size: 1rem;
+    margin-top: -5px; /* Adjust spacing */
+}
+
+/* --- Calculation Steps Collapsible --- */
+#calculation-steps-collapsible .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+#calculation-steps-collapsible .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.mathjax-container {
+    background-color: #f8f9fa; /* Slightly different background */
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #212529;
+}
+
+.mathjax-container mjx-container {
+    overflow-x: auto; /* Ensure very long equations can scroll */
+    overflow-y: hidden;
+    padding-bottom: 5px; /* Space for scrollbar if needed */
+}
+
+/* --- Accordion for Supporting Info --- */
+.accordion-button {
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #0c63e4; /* Bootstrap primary when open */
+    background-color: #e7f1ff; /* Light blue background when open */
+}
+
+.accordion-button i.text-primary {
+    transition: color 0.15s ease-in-out;
+}
+
+.accordion-button:not(.collapsed) i.text-primary {
+    color: inherit !important; /* Match button text color when open */
+}
+
+.accordion-body {
+    font-size: 0.9rem;
+    background-color: #fff;
+}
+
+.accordion-body .form-select-sm {
+    max-width: 120px;
+    font-size: 0.8rem;
+}
+
+.accordion-body .btn-sm {
+    font-size: 0.8rem;
+}
+
+.accordion-item:first-of-type .accordion-button {
+    border-top-left-radius: calc(0.25rem - 1px);
+    border-top-right-radius: calc(0.25rem - 1px);
+}
+.accordion-item:last-of-type .accordion-button.collapsed {
+    border-bottom-right-radius: calc(0.25rem - 1px);
+    border-bottom-left-radius: calc(0.25rem - 1px);
+}
+.accordion-item:last-of-type .accordion-collapse {
+    border-bottom-right-radius: calc(0.25rem - 1px);
+    border-bottom-left-radius: calc(0.25rem - 1px);
+}
+
+/* Copy button feedback styling */
+.btn-success .fa-check {
+    color: white !important;
+}
+.btn-danger .fa-times {
+    color: white !important;
+}
+.btn-warning .fa-times {
+    color: #212529 !important; /* Dark for warning background */
+}
+
+/* Ensure selects for units in input groups don't double border */
+.input-group > .form-select.input-unit-select {
+    border-left: 0;
+}
+
+/* Specific styling for epsilon/k where unit is fixed and select is hidden */
+input[name="epsilon_k_A_ce"] + select[name="epsilon_k_A_ce_unit"] + .input-group-text,
+input[name="epsilon_k_B_ce"] + select[name="epsilon_k_B_ce_unit"] + .input-group-text {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 991.98px) { /* lg breakpoint */
+    .sticky-lg-top {
+        position: static !important; /* Disable sticky top on smaller screens */
+    }
+}
+
+@media (max-width: 767.98px) { /* md breakpoint */
+    .calculator-page-wrapper .display-4 {
+        font-size: 2.2rem;
+    }
+    .input-card .card-body {
+        padding: 1rem; /* Reduce padding on smaller screens */
+    }
+    #result-value-ce {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 575.98px) { /* sm breakpoint */
+     .calculator-page-wrapper .display-4 {
+        font-size: 2rem;
+    }
+    .calculator-page-wrapper .lead {
+        font-size: 1rem;
+    }
+    .input-card .form-label {
+        font-size: 0.85rem;
+    }
+    .output-card .card-body,
+    .accordion-body {
+        padding: 0.8rem;
+    }
+    #result-value-ce {
+        font-size: 1.5rem;
+    }
+}
+
+/* MathJax specific styling if needed for better integration */
+.MJXc-display {
+    margin: 1em 0 !important;
+} 
